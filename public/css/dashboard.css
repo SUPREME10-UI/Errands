@@ -1,0 +1,279 @@
+/* Dashboard Layout CSS (Common for User and Admin dashboards) */
+
+.db-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-main);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Sidebar Navigation */
+.db-sidebar {
+  width: var(--sidebar-width);
+  background: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  transition: var(--transition-smooth);
+}
+
+.db-sidebar-logo {
+  padding: 1.5rem 2rem;
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.db-sidebar-menu {
+  padding: 2rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-grow: 1;
+}
+
+.db-menu-link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.db-menu-link:hover,
+.db-menu-link.active {
+  background: rgba(0, 82, 255, 0.08);
+  color: var(--secondary);
+}
+
+.db-menu-link svg {
+  transition: var(--transition-smooth);
+}
+
+.db-menu-link:hover svg,
+.db-menu-link.active svg {
+  color: var(--secondary);
+}
+
+.db-sidebar-footer {
+  padding: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.db-user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.db-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--gradient-primary);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.db-user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.db-user-info span:first-child {
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.db-user-info span:last-child {
+  font-size: 0.7rem;
+  color: var(--text-light);
+}
+
+/* Main Dashboard Panel */
+.db-main {
+  flex-grow: 1;
+  margin-left: var(--sidebar-width);
+  padding: 2rem 3rem;
+  min-height: 100vh;
+  transition: var(--transition-smooth);
+}
+
+/* Dashboard Header */
+.db-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1.5rem;
+}
+
+.db-header-title h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.db-header-title p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.db-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* Notification Dropper */
+.db-noti-bell {
+  position: relative;
+  cursor: pointer;
+}
+
+.db-noti-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--danger);
+  border: 1.5px solid var(--bg-card);
+}
+
+.db-noti-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 320px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  padding: 1rem 0;
+  display: none;
+  z-index: 120;
+  animation: slideInNoti 0.25s ease forwards;
+}
+
+.db-noti-dropdown.active {
+  display: block;
+}
+
+@keyframes slideInNoti {
+  0% { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.db-noti-header {
+  padding: 0 1.25rem 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.db-noti-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.db-noti-item {
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.8rem;
+  display: flex;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.db-noti-item:hover {
+  background: var(--bg-light);
+}
+
+.db-noti-item-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--secondary);
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.db-noti-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.db-noti-item-title {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.db-noti-item-time {
+  font-size: 0.7rem;
+  color: var(--text-light);
+}
+
+.db-noti-footer {
+  padding: 0.75rem 1.25rem 0 1.25rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--secondary);
+}
+
+/* Sidebar Toggle for Mobile */
+.db-sidebar-toggle {
+  display: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 102;
+}
+
+/* Responsive breakdowns */
+@media (max-width: 992px) {
+  .db-sidebar {
+    left: -100%;
+  }
+  .db-sidebar.active {
+    left: 0;
+  }
+  .db-main {
+    margin-left: 0;
+    padding: 2rem 1.5rem;
+  }
+  .db-sidebar-toggle {
+    display: flex;
+  }
+}

@@ -1,0 +1,85 @@
+/* Design Tokens and Variables */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Colors */
+  --primary-rgb: 15, 44, 89;
+  --primary: #0F2C59;
+  --primary-dark: #0A1D37;
+  --primary-light: #1E4E8F;
+  --secondary: #0052FF;
+  --secondary-rgb: 0, 82, 255;
+  --accent: #00D7FF;
+  
+  /* Neutral Palette */
+  --text-main: #1E293B;
+  --text-muted: #64748B;
+  --text-light: #94A3B8;
+  --bg-main: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-light: #F1F5F9;
+  --border-color: #E2E8F0;
+  
+  /* Status Colors */
+  --success: #10B981;
+  --success-light: #D1FAE5;
+  --warning: #F59E0B;
+  --warning-light: #FEF3C7;
+  --danger: #EF4444;
+  --danger-light: #FEE2E2;
+  --info: #3B82F6;
+  --info-light: #DBEAFE;
+  --assigned: #6366F1;
+  --assigned-light: #EEF2FF;
+  
+  /* Typography */
+  --font-heading: 'Poppins', 'Manrope', 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(15, 44, 89, 0.04);
+  --shadow-md: 0 12px 30px rgba(15, 44, 89, 0.08);
+  --shadow-lg: 0 22px 48px rgba(15, 44, 89, 0.12);
+  --shadow-glow: 0 0 20px rgba(0, 82, 255, 0.2);
+  --shadow-inset: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #0F2C59 0%, #0A1D37 100%);
+  --gradient-accent: linear-gradient(135deg, #0052FF 0%, #00D7FF 100%);
+  --gradient-soft: linear-gradient(135deg, rgba(0, 82, 255, 0.04) 0%, rgba(0, 215, 255, 0.04) 100%);
+  --gradient-card: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%);
+  
+  /* Border Radii */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 9999px;
+  
+  /* Transitions */
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  
+  /* Sizes */
+  --max-width: 1280px;
+  --header-height: 80px;
+  --sidebar-width: 260px;
+}
+
+/* Dark Mode Tokens */
+[data-theme="dark"] {
+  --text-main: #F1F5F9;
+  --text-muted: #94A3B8;
+  --text-light: #64748B;
+  --bg-main: #070F1E;
+  --bg-card: #0D1B3E;
+  --bg-light: #162447;
+  --border-color: #1E2E5B;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 22px 48px rgba(0, 0, 0, 0.4);
+  --gradient-card: linear-gradient(180deg, #0D1B3E 0%, #070F1E 100%);
+  --gradient-glass: linear-gradient(135deg, rgba(13, 27, 62, 0.8) 0%, rgba(7, 15, 30, 0.4) 100%);
+}

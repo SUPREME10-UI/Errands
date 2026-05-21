@@ -1,0 +1,200 @@
+/* Contact Page Specific CSS */
+
+.contact-hero {
+  padding: 9rem 0 5rem 0;
+  background: var(--gradient-soft);
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.contact-hero h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.contact-hero p {
+  color: var(--text-muted);
+  max-width: 600px;
+  margin: 0 auto;
+  font-size: 1.15rem;
+}
+
+.contact-section {
+  padding: 6rem 0;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+}
+
+/* Support channels cards */
+.channel-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+@media (max-width: 576px) {
+  .channel-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.channel-card {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.channel-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+}
+
+.channel-icon.whatsapp {
+  background: #25D366;
+  box-shadow: 0 0 15px rgba(37, 211, 102, 0.3);
+  cursor: pointer;
+  transition: var(--transition-bounce);
+}
+
+.channel-icon.whatsapp:hover {
+  transform: scale(1.1) rotate(10deg);
+}
+
+.channel-icon.email {
+  background: var(--secondary);
+  box-shadow: 0 0 15px rgba(0, 82, 255, 0.3);
+}
+
+.channel-card h4 {
+  font-size: 1rem;
+}
+
+.channel-card p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.channel-card a {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--primary);
+}
+
+[data-theme="dark"] .channel-card a {
+  color: var(--accent);
+}
+
+/* SVG Office Map Marker styling */
+.office-map-container {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  height: 280px;
+  position: relative;
+}
+
+.office-map-svg {
+  width: 100%;
+  height: 100%;
+  background: #EBF5FB;
+}
+
+[data-theme="dark"] .office-map-svg {
+  background: #0B132B;
+}
+
+.map-street-grid {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-image: 
+    linear-gradient(to right, rgba(0, 82, 255, 0.06) 1.5px, transparent 1.5px),
+    linear-gradient(to bottom, rgba(0, 82, 255, 0.06) 1.5px, transparent 1.5px);
+  background-size: 40px 40px;
+}
+
+.map-location-marker {
+  position: absolute;
+  top: 40%;
+  left: 55%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.marker-pulse {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: var(--secondary);
+  box-shadow: 0 0 0 8px rgba(0, 82, 255, 0.25);
+  animation: pulseMarker 1.8s infinite ease-in-out;
+}
+
+@keyframes pulseMarker {
+  0% { transform: scale(0.9); box-shadow: 0 0 0 4px rgba(0, 82, 255, 0.25); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 14px rgba(0, 82, 255, 0); }
+  100% { transform: scale(0.9); box-shadow: 0 0 0 4px rgba(0, 82, 255, 0); }
+}
+
+.marker-label {
+  background: var(--primary);
+  color: #FFFFFF;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  margin-top: 0.5rem;
+  white-space: nowrap;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.hours-info-box {
+  background: var(--bg-light);
+  border-radius: var(--radius-md);
+  padding: 1.5rem 2rem;
+  border: 1px solid var(--border-color);
+  font-size: 0.9rem;
+}
+
+.hours-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  border-bottom: 1.5px dashed var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.hours-row:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
