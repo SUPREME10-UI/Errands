@@ -11,108 +11,112 @@
 </head>
 <body>
 
+  <!-- Splash Screen Loading Overlay -->
+  <div id="splash-screen">
+    <div class="splash-content">
+      <div class="splash-logo-container">
+        <img src="/logo.jpg" alt="RME Logo" class="splash-logo">
+        <div class="splash-pulse"></div>
+      </div>
+      <h2 class="splash-title">RUN MY ERRAND</h2>
+      <p class="splash-subtitle">Errands Done Right</p>
+      <div class="splash-loader-bar">
+        <div class="splash-loader-progress"></div>
+      </div>
+      <p class="splash-loading-text">Initializing Concierge Services...</p>
+    </div>
+  </div>
+
   <div class="db-container">
-    <!-- Sidebar Navigation -->
-    <aside class="db-sidebar">
-      <div class="db-sidebar-logo">
-        <a href="/" class="logo">
-          <div class="logo-circle">RME</div>
-          <div class="logo-text">
-            <span>RUN MY ERRAND</span>
-            <span>Errands Done Right</span>
-          </div>
-        </a>
-      </div>
-
-      <nav class="db-sidebar-menu">
-        <div class="db-menu-link active" id="menu-new-errand">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          Book an Errand
-        </div>
-        <div class="db-menu-link" id="menu-my-errands">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line>
-          </svg>
-          Active Errands
-        </div>
-        <a href="/contact" class="db-menu-link">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
-          Contact Support
-        </a>
-        <a href="/" class="db-menu-link" style="margin-top: auto; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line>
-          </svg>
-          Logout / Exit
-        </a>
-      </nav>
-
-      <div class="db-sidebar-footer">
-        <div class="db-user-profile">
-          <div class="db-user-avatar">AO</div>
-          <div class="db-user-info">
-            <span>Abena Osei</span>
-            <span>Premium Member</span>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Main Content Panel -->
+    <!-- Main Content Panel (Full Width) -->
     <main class="db-main">
-      <!-- Dashboard Header -->
-      <header class="db-header">
-        <div class="db-header-title">
-          <button class="db-sidebar-toggle theme-toggle" id="sidebar-toggle-btn" aria-label="Toggle Sidebar" style="display:none; margin-right: 1rem;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
-          <div style="display: inline-block;">
-            <h1 id="db-title-text">Book a New Errand</h1>
-            <p id="db-subtitle-text">Fill out our custom logistics form to get dispatched in real time.</p>
-          </div>
-        </div>
+      <!-- Top Navigation Header -->
+      <header class="db-header-nav">
+        <div class="db-nav-container">
+          <!-- Logo -->
+          <a href="/" class="logo">
+            <img class="logo-image" src="/logo.jpg" alt="RME Logo">
+            <div class="logo-text">
+              <span>RUN MY ERRAND</span>
+              <span>Errands Done Right</span>
+            </div>
+          </a>
 
-        <div class="db-header-actions">
-          <button class="btn-icon theme-toggle" aria-label="Toggle Theme"></button>
-          
-          <div class="db-noti-bell" id="bell-container">
-            <button class="btn-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          <!-- Horizontal Top Menu Tabs -->
+          <nav class="db-top-menu">
+            <a id="menu-new-errand" class="db-menu-link active">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14"></path>
               </svg>
-            </button>
-            <div class="db-noti-badge" id="noti-badge"></div>
+              <span>New Errand</span>
+            </a>
+            <a id="menu-my-errands" class="db-menu-link">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9l2 2 4-4"></path>
+              </svg>
+              <span>Active Tracker</span>
+            </a>
+          </nav>
+
+          <!-- Header Actions -->
+          <div class="db-header-right">
+            <button class="btn-icon theme-toggle" aria-label="Toggle Theme"></button>
             
-            <!-- Notification list -->
-            <div class="db-noti-dropdown" id="noti-dropdown">
-              <div class="db-noti-header">
-                <span>System Alerts</span>
-                <span style="font-size: 0.7rem; color: var(--text-light); font-weight: 500; cursor: pointer;" id="noti-clear">Mark read</span>
-              </div>
-              <div class="db-noti-list" id="noti-list">
-                <div class="db-noti-item">
-                  <div class="db-noti-item-dot"></div>
-                  <div class="db-noti-item-content">
-                    <span class="db-noti-item-title">Welcome to RME!</span>
-                    <span class="db-noti-item-time">Just now</span>
+            <!-- Notifications -->
+            <div class="db-noti-bell" id="bell-container">
+              <button class="btn-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </button>
+              <div class="db-noti-badge" id="noti-badge"></div>
+              
+              <!-- Notification list -->
+              <div class="db-noti-dropdown" id="noti-dropdown">
+                <div class="db-noti-header">
+                  <span>System Alerts</span>
+                  <span style="font-size: 0.7rem; color: var(--text-light); font-weight: 500; cursor: pointer;" id="noti-clear">Mark read</span>
+                </div>
+                <div class="db-noti-list" id="noti-list">
+                  <div class="db-noti-item">
+                    <div class="db-noti-item-dot"></div>
+                    <div class="db-noti-item-content">
+                      <span class="db-noti-item-title">Welcome to RME!</span>
+                      <span class="db-noti-item-time">Just now</span>
+                    </div>
                   </div>
                 </div>
+                <div class="db-noti-footer">View details in active tracker</div>
               </div>
-              <div class="db-noti-footer">View details in active tracker</div>
             </div>
+
+            <!-- Book Now CTA -->
+            <a href="#booking-flow-section" class="btn btn-primary db-cta-btn">Book Now</a>
           </div>
         </div>
       </header>
 
       <!-- BOOK AN ERRAND FLOW -->
       <div id="booking-flow-section" class="booking-layout">
-        <div class="card" style="padding: 2.5rem 2rem;">
+
+        <div class="card booking-wizard-card">
+          <!-- Wizard Card Header -->
+          <div class="booking-wizard-header">
+            <div class="booking-wizard-header-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                <path d="M2 17l10 5 10-5"></path>
+                <path d="M2 12l10 5 10-5"></path>
+              </svg>
+            </div>
+            <div>
+              <h2 class="booking-wizard-title" id="db-title-text">Book a New Errand</h2>
+              <p class="booking-wizard-subtitle" id="db-subtitle-text">Fill out our custom logistics form to get dispatched in real time.</p>
+            </div>
+          </div>
+
+          <!-- Wizard body: stepper + form -->
+          <div class="booking-wizard-body">
           <!-- Stepper Node header -->
           <div class="stepper">
             <div class="step-node active" data-step="1">1</div>
@@ -126,68 +130,94 @@
             <!-- Step 1: Category Pick -->
             <div class="wizard-panel active" data-step="1">
               <h2 style="font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--primary);">Step 1: Select Errand Category</h2>
-              <div class="category-picker-grid" id="category-grid">
-                <div class="picker-card selected" data-value="Parcel Pickup & Delivery" data-base="50">
-                  <div class="picker-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="3" width="15" height="13" rx="2" ry="2"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-                  </div>
-                  <div class="picker-details">
-                    <h4>Parcel Delivery</h4>
-                    <p>Accra Package drop-offs</p>
-                  </div>
-                </div>
+              <div class="form-group" style="margin-top: 1rem;">
+                <label class="form-label">Errand Category</label>
 
-                <div class="picker-card" data-value="Bill Payments & Bank Runs" data-base="75">
-                  <div class="picker-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="4" x2="12" y2="20"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+                <!-- Custom Dropdown (replaces native select) -->
+                <div class="custom-select" id="category-custom-select">
+                  <div class="custom-select-trigger" id="category-trigger" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+                    <div class="custom-select-trigger-inner">
+                      <span class="custom-select-icon" id="category-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                      </span>
+                      <div class="custom-select-value">
+                        <span class="custom-select-label" id="category-label">Parcel Pickup &amp; Delivery</span>
+                        <span class="custom-select-desc" id="category-desc">Fast &amp; secure parcel courier service</span>
+                      </div>
+                    </div>
+                    <svg class="custom-select-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                   </div>
-                  <div class="picker-details">
-                    <h4>Bank & Bill payments</h4>
-                    <p>Clearance drops & check payouts</p>
-                  </div>
-                </div>
 
-                <div class="picker-card" data-value="Shopping & Vendor Services" data-base="55">
-                  <div class="picker-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                  </div>
-                  <div class="picker-details">
-                    <h4>Market Sourcing</h4>
-                    <p>Grocery shop & purchase lists</p>
-                  </div>
-                </div>
+                  <div class="custom-select-dropdown" id="category-dropdown" role="listbox">
+                    <div class="custom-select-option active" role="option" data-value="Parcel Pickup &amp; Delivery" data-base="50" data-desc="Fast &amp; secure parcel courier service" data-icon="package">
+                      <span class="option-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                      </span>
+                      <div class="option-text">
+                        <span class="option-title">Parcel Pickup &amp; Delivery</span>
+                        <span class="option-subtitle">Fast &amp; secure parcel courier service</span>
+                      </div>
+                      <span class="option-check">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      </span>
+                    </div>
 
-                <div class="picker-card" data-value="House Management" data-base="80">
-                  <div class="picker-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-                  </div>
-                  <div class="picker-details">
-                    <h4>House Administration</h4>
-                    <p>Meter updates & property drops</p>
-                  </div>
-                </div>
+                    <div class="custom-select-option" role="option" data-value="Shopping &amp; Vendor Services" data-base="55" data-desc="Market runs, vendor &amp; shopping sourcing">
+                      <span class="option-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                      </span>
+                      <div class="option-text">
+                        <span class="option-title">Shopping &amp; Vendor Services</span>
+                        <span class="option-subtitle">Market runs, vendor &amp; shopping sourcing</span>
+                      </div>
+                      <span class="option-check">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      </span>
+                    </div>
 
-                <div class="picker-card" data-value="Site Inspection Updates" data-base="150">
-                  <div class="picker-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                  </div>
-                  <div class="picker-details">
-                    <h4>Site Inspections</h4>
-                    <p>Diaspora construction verifications</p>
-                  </div>
-                </div>
+                    <div class="custom-select-option" role="option" data-value="House Management" data-base="80" data-desc="Household errands &amp; admin management">
+                      <span class="option-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                      </span>
+                      <div class="option-text">
+                        <span class="option-title">House Management</span>
+                        <span class="option-subtitle">Household errands &amp; admin management</span>
+                      </div>
+                      <span class="option-check">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      </span>
+                    </div>
 
-                <div class="picker-card" data-value="Personal & Corporate Errands" data-base="60">
-                  <div class="picker-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                  </div>
-                  <div class="picker-details">
-                    <h4>General Office runs</h4>
-                    <p>Corporate registry, permit submissions</p>
+                    <div class="custom-select-option" role="option" data-value="Site Inspection Updates" data-base="150" data-desc="Professional on-site inspection &amp; reporting">
+                      <span class="option-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                      </span>
+                      <div class="option-text">
+                        <span class="option-title">Site Inspection Updates</span>
+                        <span class="option-subtitle">Professional on-site inspection &amp; reporting</span>
+                      </div>
+                      <span class="option-check">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      </span>
+                    </div>
+
+                    <div class="custom-select-option" role="option" data-value="Personal &amp; Corporate Errands" data-base="60" data-desc="General personal &amp; corporate office runs">
+                      <span class="option-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                      </span>
+                      <div class="option-text">
+                        <span class="option-title">Personal &amp; Corporate Errands</span>
+                        <span class="option-subtitle">General personal &amp; corporate office runs</span>
+                      </div>
+                      <span class="option-check">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      </span>
+                    </div>
                   </div>
                 </div>
+                <!-- Hidden native input for form value binding -->
+                <input type="hidden" id="field-category" name="field-category" value="Parcel Pickup &amp; Delivery">
               </div>
-              <input type="hidden" id="field-category" value="Parcel Pickup & Delivery">
             </div>
 
             <!-- Step 2: Route details -->
@@ -214,9 +244,9 @@
               <div class="form-group">
                 <label class="form-label" for="field-urgency">Choose Urgency Speed SLA</label>
                 <select class="form-select" id="field-urgency">
-                  <option value="Standard">Standard (Within 1 business day) - No Surcharge</option>
-                  <option value="Urgent">Urgent (Within 3 Hours) - +GHS 45.00 Surcharge</option>
-                  <option value="Express">Express (Instant Dispatch, Direct Delivery) - +GHS 100.00 Surcharge</option>
+                  <option value="Standard">Standard — Within 1 Business Day</option>
+                  <option value="Urgent">Urgent — Within 3 Hours</option>
+                  <option value="Express">Express — Instant Dispatch &amp; Direct Delivery</option>
                 </select>
               </div>
             </div>
@@ -245,38 +275,9 @@
               <button class="btn btn-primary" type="submit" id="wizard-submit-btn" style="display:none; margin-left: auto; background: var(--success); box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);">Submit Errand Order</button>
             </div>
           </form>
-        </div>
+          </div><!-- /.booking-wizard-body -->
+        </div><!-- /.card.booking-wizard-card -->
 
-        <!-- Sidebar Summary Box -->
-        <aside class="summary-box">
-          <h3 class="summary-heading">Errand Cost Summary</h3>
-          <div class="summary-row">
-            <span>Errand Base Cost:</span>
-            <span id="summary-base-val">GHS 50.00</span>
-          </div>
-          <div class="summary-row">
-            <span>Urgency Speed SLA:</span>
-            <span id="summary-urgency-label">Standard</span>
-          </div>
-          <div class="summary-row" style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
-            <span>Urgency Surcharge:</span>
-            <span id="summary-urgency-val">GHS 0.00</span>
-          </div>
-          
-          <div class="cost-breakdown-details">
-            Distance-based charges are included in standard category base rates for Accra metropolitan areas. Outer zones may apply manual adjustments.
-          </div>
-          
-          <div class="summary-row">
-            <span>VAT / NHIL / GETFund (5%):</span>
-            <span id="summary-tax-val">GHS 2.50</span>
-          </div>
-          
-          <div class="summary-row total-row">
-            <span>Estimated Total:</span>
-            <span id="summary-total-val">GHS 52.50</span>
-          </div>
-        </aside>
       </div>
 
       <!-- MY ERRANDS / TRACKER SECTION -->

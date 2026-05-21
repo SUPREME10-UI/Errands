@@ -18,17 +18,40 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileNav = document.querySelector('.mobile-nav');
 
   if (hamburger && mobileNav) {
+    // Create overlay element dynamically
+    const overlay = document.createElement('div');
+    overlay.className = 'mobile-nav-overlay';
+    document.body.appendChild(overlay);
+
+    const closeMenu = () => {
+      hamburger.classList.remove('active');
+      mobileNav.classList.remove('active');
+      overlay.classList.remove('active');
+      document.body.style.overflow = ''; // Restore scroll
+    };
+
     hamburger.addEventListener('click', () => {
-      hamburger.classList.toggle('active');
-      mobileNav.classList.toggle('active');
+      const isActive = mobileNav.classList.contains('active');
+      if (isActive) {
+        closeMenu();
+      } else {
+        hamburger.classList.add('active');
+        mobileNav.classList.add('active');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent body scroll
+      }
     });
 
-    // Close mobile nav when clicking a link
-    mobileNav.querySelectorAll('.nav-link').forEach(link => {
+    // Close mobile nav when clicking a link or button inside it
+    mobileNav.querySelectorAll('.nav-link, .btn').forEach(link => {
       link.addEventListener('click', () => {
-        hamburger.classList.remove('active');
-        mobileNav.classList.remove('active');
+        closeMenu();
       });
+    });
+
+    // Close mobile nav when clicking on the background overlay
+    overlay.addEventListener('click', () => {
+      closeMenu();
     });
   }
 
@@ -147,3 +170,29 @@ function updateThemeToggleIcons(theme) {
     }
   });
 }
+
+// Global Splash Screen Loading Dismissal Handler
+document.addEventListener('DOMContentLoaded', () => {
+  const splash = document.getElementById('splash-screen');
+  if (splash) {
+    // Dismiss once all page images/stylesheets are fully loaded
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        splash.classList.add('fade-out');
+        // Destroy element completely after transition finished
+        setTimeout(() => {
+          splash.remove();
+        }, 600);
+      }, 1500); // Premium 1.5 seconds loading screen hold
+    });
+
+    // Safety fallback: dismiss after 4 seconds regardless of load event
+    setTimeout(() => {
+      const activeSplash = document.getElementById('splash-screen');
+      if (activeSplash) {
+        activeSplash.classList.add('fade-out');
+        setTimeout(() => activeSplash.remove(), 600);
+      }
+    }, 4000);
+  }
+});

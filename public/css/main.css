@@ -459,6 +459,50 @@ input, button, select, textarea {
   font-size: 1.25rem;
 }
 
+/* Mobile Sidebar Menu Backdrop Overlay */
+.mobile-nav-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 44, 89, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 98;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition-smooth);
+}
+
+.mobile-nav-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 576px) {
+  .header .nav-actions .btn-primary {
+    display: none; /* Hide client login from main row on mobile */
+  }
+  .logo-text span:last-child {
+    display: none; /* Hide logo subtitle */
+  }
+  .logo-text span:first-child {
+    font-size: 1.15rem; /* Shrink logo title font */
+  }
+  .logo-image {
+    width: 38px;
+    height: 38px; /* Compact logo icon on mobile */
+  }
+}
+
+@media (max-width: 400px) {
+  .logo-text {
+    display: none; /* Hide logo text completely to fit toggle and hamburger on very narrow screens */
+  }
+}
+
+
 /* Footer Design */
 .footer {
   background: var(--gradient-primary);
@@ -589,6 +633,10 @@ input, button, select, textarea {
     gap: 1rem;
     text-align: center;
   }
+  .footer-bottom div {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 }
 
 /* Toast Notifications Container */
@@ -653,4 +701,167 @@ input, button, select, textarea {
   .nav-menu {
     display: none;
   }
+}
+
+/* Premium Branding Logo Image Style */
+.logo-image {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 2px solid var(--secondary);
+  box-shadow: var(--shadow-glow);
+  transition: transform 0.3s ease;
+}
+
+.logo:hover .logo-image {
+  transform: scale(1.08);
+}
+
+/* Splash Screen Loading Overlay Styles */
+#splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #0B1528; /* Premium dark background */
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+  opacity: 1;
+  visibility: visible;
+}
+
+[data-theme="light"] #splash-screen {
+  background: #F8FAFC; /* Premium light background */
+}
+
+#splash-screen.fade-out {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.splash-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.splash-logo-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 1.5rem;
+}
+
+.splash-logo {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--secondary);
+  box-shadow: 0 0 30px rgba(0, 82, 255, 0.4);
+  position: relative;
+  z-index: 2;
+  animation: splashScale 2s ease-in-out infinite alternate;
+}
+
+.splash-pulse {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border-radius: 50%;
+  border: 2px solid var(--secondary);
+  opacity: 0;
+  animation: splashPulse 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  z-index: 1;
+}
+
+.splash-title {
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 0.25rem;
+  letter-spacing: -0.03em;
+  animation: splashFadeIn 0.8s ease-out forwards;
+}
+
+[data-theme="light"] .splash-title {
+  color: var(--primary);
+}
+
+.splash-subtitle {
+  font-size: 0.95rem;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 2.5rem;
+  font-weight: 600;
+  animation: splashFadeIn 1s ease-out forwards;
+}
+
+.splash-loader-bar {
+  width: 200px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+[data-theme="light"] .splash-loader-bar {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.splash-loader-progress {
+  width: 0;
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+  animation: fillProgress 1.6s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+.splash-loading-text {
+  font-size: 0.8rem;
+  color: #94A3B8;
+  letter-spacing: 0.05em;
+  animation: splashPulseText 1.5s ease-in-out infinite alternate;
+}
+
+[data-theme="light"] .splash-loading-text {
+  color: #64748B;
+}
+
+@keyframes splashScale {
+  0% { transform: scale(0.96); }
+  100% { transform: scale(1.04); }
+}
+
+@keyframes splashPulse {
+  0% { transform: scale(0.85); opacity: 0.8; }
+  100% { transform: scale(1.25); opacity: 0; }
+}
+
+@keyframes splashFadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes splashPulseText {
+  0% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+@keyframes fillProgress {
+  0% { width: 0%; }
+  50% { width: 45%; }
+  75% { width: 85%; }
+  100% { width: 100%; }
 }

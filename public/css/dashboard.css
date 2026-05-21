@@ -1,145 +1,368 @@
-/* Dashboard Layout CSS (Common for User and Admin dashboards) */
+/* Dashboard Layout CSS (Modern Top-Header Navigation) */
 
 .db-container {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
   background-color: var(--bg-main);
   position: relative;
-  overflow: hidden;
 }
 
-/* Sidebar Navigation */
-.db-sidebar {
-  width: var(--sidebar-width);
-  background: var(--bg-card);
-  border-right: 1px solid var(--border-color);
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 90;
-  transition: var(--transition-smooth);
+/* Book Now CTA in Header */
+.db-cta-btn {
+  font-size: 0.85rem;
+  padding: 0.55rem 1.35rem;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
-.db-sidebar-logo {
-  padding: 1.5rem 2rem;
-  height: var(--header-height);
+/* Booking Wizard Card (unified layout - title lives inside the card) */
+.booking-wizard-card {
+  padding: 0;
+  overflow: visible;
+}
+
+.booking-wizard-header {
   display: flex;
   align-items: center;
+  gap: 1rem;
+  padding: 1.75rem 2.25rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(135deg, rgba(0, 82, 255, 0.03) 0%, transparent 60%);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
-.db-sidebar-menu {
-  padding: 2rem 1.25rem;
+.booking-wizard-header-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
+  background: var(--gradient-primary);
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(0, 82, 255, 0.25);
 }
 
-.db-menu-link {
+.booking-wizard-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+  margin: 0;
+  line-height: 1.2;
+}
+
+[data-theme="dark"] .booking-wizard-title {
+  color: var(--bg-light);
+}
+
+.booking-wizard-subtitle {
+  margin: 0.2rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+/* Booking wizard body (stepper + form panels padding) */
+.booking-wizard-body {
+  padding: 2rem 2.25rem;
+}
+
+/* ===================== */
+/* Custom Select Dropdown */
+/* ===================== */
+.custom-select {
+  position: relative;
+  width: 100%;
+  user-select: none;
+  z-index: 2;
+}
+
+.custom-select.open {
+  z-index: 10;
+}
+
+.custom-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.95rem 1.2rem;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  outline: none;
+}
+
+.custom-select-trigger:hover,
+.custom-select.open .custom-select-trigger {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(0, 82, 255, 0.1);
+}
+
+.custom-select-trigger-inner {
   display: flex;
   align-items: center;
   gap: 0.85rem;
-  padding: 0.85rem 1.25rem;
-  border-radius: var(--radius-sm);
-  color: var(--text-muted);
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: var(--transition-smooth);
+  flex: 1;
+  min-width: 0;
 }
 
-.db-menu-link:hover,
-.db-menu-link.active {
+.custom-select-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
   background: rgba(0, 82, 255, 0.08);
   color: var(--secondary);
-}
-
-.db-menu-link svg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   transition: var(--transition-smooth);
 }
 
-.db-menu-link:hover svg,
-.db-menu-link.active svg {
+.custom-select.open .custom-select-icon {
+  background: rgba(0, 82, 255, 0.15);
+}
+
+.custom-select-value {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.custom-select-label {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.custom-select-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.custom-select-arrow {
+  color: var(--text-light);
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-select.open .custom-select-arrow {
+  transform: rotate(180deg);
   color: var(--secondary);
 }
 
-.db-sidebar-footer {
-  padding: 1.5rem;
-  border-top: 1px solid var(--border-color);
+/* Dropdown List */
+.custom-select-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-8px) scaleY(0.96);
+  transform-origin: top center;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.db-user-profile {
+.custom-select.open .custom-select-dropdown {
+  opacity: 1;
+  transform: translateY(0) scaleY(1);
+  pointer-events: all;
+}
+
+/* Each Option */
+.custom-select-option {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.9rem 1.2rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.custom-select-option:last-child {
+  border-bottom: none;
+}
+
+.custom-select-option:hover {
+  background: rgba(0, 82, 255, 0.05);
+}
+
+.custom-select-option.active {
+  background: rgba(0, 82, 255, 0.07);
+}
+
+.option-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 82, 255, 0.08);
+  color: var(--secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.custom-select-option.active .option-icon {
+  background: rgba(0, 82, 255, 0.15);
+}
+
+.option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.option-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+.custom-select-option.active .option-title {
+  color: var(--secondary);
+}
+
+.option-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.option-check {
+  color: var(--secondary);
+  opacity: 0;
+  flex-shrink: 0;
+  transition: opacity 0.15s ease;
+}
+
+.custom-select-option.active .option-check {
+  opacity: 1;
+}
+
+
+
+/* Main Dashboard Panel (Full Width) */
+.db-main {
+  flex-grow: 1;
+  margin-left: 0;
+  padding: 2rem 3rem;
+  min-height: calc(100vh - var(--header-height));
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  transition: var(--transition-smooth);
+}
+
+/* Top Navigation Header */
+.db-header-nav {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  background: rgba(var(--bg-card), 0.95);
+  padding: 0.85rem 3rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-smooth);
+}
+
+.db-nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 2rem;
+}
+
+/* Horizontal Top Menu Tabs */
+.db-top-menu {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.db-user-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
-  background: var(--gradient-primary);
-  color: #FFFFFF;
+.db-top-menu .db-menu-link {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-weight: 700;
-}
-
-.db-user-info {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-}
-
-.db-user-info span:first-child {
-  font-weight: 700;
-  font-size: 0.85rem;
-}
-
-.db-user-info span:last-child {
-  font-size: 0.7rem;
-  color: var(--text-light);
-}
-
-/* Main Dashboard Panel */
-.db-main {
-  flex-grow: 1;
-  margin-left: var(--sidebar-width);
-  padding: 2rem 3rem;
-  min-height: 100vh;
+  gap: 0.6rem;
+  padding: 0.65rem 1.15rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
   transition: var(--transition-smooth);
 }
 
-/* Dashboard Header */
-.db-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2.5rem;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 1.5rem;
+.db-top-menu .db-menu-link:hover,
+.db-top-menu .db-menu-link.active {
+  background: rgba(0, 82, 255, 0.08);
+  color: var(--secondary);
 }
 
-.db-header-title h1 {
-  font-size: 1.8rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
+.db-top-menu .db-menu-link svg {
+  transition: var(--transition-smooth);
 }
 
-.db-header-title p {
-  color: var(--text-muted);
-  font-size: 0.95rem;
+.db-top-menu .db-menu-link:hover svg,
+.db-top-menu .db-menu-link.active svg {
+  color: var(--secondary);
 }
 
-.db-header-actions {
+/* Actions Bar Right Side */
+.db-header-right {
   display: flex;
   align-items: center;
   gap: 1.25rem;
+}
+
+.db-header-profile {
+  display: flex;
+  align-items: center;
+  border-left: 1px solid var(--border-color);
+  padding-left: 1.25rem;
+}
+
+.logout-btn {
+  color: var(--text-muted);
+  transition: var(--transition-smooth);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+}
+
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--danger);
 }
 
 /* Notification Dropper */
@@ -247,33 +470,57 @@
   color: var(--secondary);
 }
 
-/* Sidebar Toggle for Mobile */
-.db-sidebar-toggle {
-  display: none;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  width: 40px;
-  height: 40px;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 102;
-}
-
 /* Responsive breakdowns */
 @media (max-width: 992px) {
-  .db-sidebar {
-    left: -100%;
+  .db-header-nav {
+    padding: 0.75rem 1.5rem;
   }
-  .db-sidebar.active {
-    left: 0;
+  
+  .db-nav-container {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  
+  .logo {
+    order: 1;
+  }
+  
+  .db-header-right {
+    order: 2;
+  }
+  
+  .db-top-menu {
+    order: 3;
+    width: 100%;
+    justify-content: space-around;
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.75rem;
+    margin-top: 0.25rem;
+    gap: 0.5rem;
+  }
+  
+  .db-top-menu .db-menu-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  .db-user-info {
+    display: none;
   }
   .db-main {
-    margin-left: 0;
-    padding: 2rem 1.5rem;
-  }
-  .db-sidebar-toggle {
-    display: flex;
+    padding: 1.5rem 1.25rem;
   }
 }
+
+@media (max-width: 768px) {
+  .db-cta-btn {
+    display: none !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .db-main {
+    padding: 1.25rem 0.75rem !important;
+  }
+}
+

@@ -2,24 +2,21 @@
 
 .booking-layout {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-columns: 1fr;
   gap: 2.5rem;
   align-items: start;
-}
-
-@media (max-width: 1024px) {
-  .booking-layout {
-    grid-template-columns: 1fr;
-  }
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 /* Wizard Stepper Progress Bar */
 .stepper {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 2.5rem;
+  margin: 0 auto 2.5rem auto;
   position: relative;
   max-width: 480px;
+  width: 100%;
 }
 
 .stepper::after {
@@ -71,6 +68,8 @@
 
 .wizard-panel.active {
   display: block;
+  position: relative;
+  z-index: 5;
 }
 
 @keyframes slideInPanel {
@@ -498,9 +497,94 @@
   font-size: 1.2rem;
   margin-top: 0.5rem;
 }
-
 .empty-state p {
   color: var(--text-muted);
   max-width: 320px;
   font-size: 0.9rem;
 }
+
+/* ==========================================================================
+   Mobile Responsiveness & Viewport Adaptations (booking & tracker cards)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .booking-layout {
+    gap: 1.5rem;
+  }
+
+  .summary-box {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  /* Booking wizard card adjustments */
+  .booking-wizard-header {
+    padding: 1.25rem 1.25rem 1rem !important;
+    gap: 0.75rem !important;
+  }
+  
+  .booking-wizard-header-icon {
+    width: 38px !important;
+    height: 38px !important;
+  }
+  
+  .booking-wizard-header-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .booking-wizard-title {
+    font-size: 1.15rem !important;
+  }
+  
+  .booking-wizard-subtitle {
+    font-size: 0.75rem !important;
+  }
+  
+  .booking-wizard-body {
+    padding: 1.25rem 1.25rem !important;
+  }
+
+  .stepper {
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .drag-drop-zone {
+    padding: 1.75rem 1rem;
+  }
+
+  /* Active orders timeline transformation: horizontal to vertical */
+  .timeline-horizontal {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1.5rem !important;
+    padding: 0.75rem 0 0.75rem 0.5rem !important;
+  }
+
+  .timeline-horizontal::after {
+    top: 15px !important;
+    left: 17px !important;
+    width: 2.5px !important;
+    height: calc(100% - 30px) !important;
+  }
+
+  .timeline-h-step {
+    flex-direction: row !important;
+    align-items: center !important;
+    text-align: left !important;
+    width: 100% !important;
+    gap: 1rem !important;
+  }
+
+  .timeline-h-dot {
+    margin-bottom: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .timeline-h-label {
+    font-size: 0.8rem !important;
+  }
+}
+

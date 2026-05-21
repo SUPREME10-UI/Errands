@@ -4,17 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Our Services | Run My Errand - Professional Logistics & Concierge</title>
-  <meta name="description" content="Explore our 8 corporate-grade service categories. Secure banking deposits, corporate courier drop-offs, house maintenance updates, and real-time site inspections.">
+  <meta name="description" content="Explore our corporate-grade service categories, including courier drop-offs, house maintenance updates, and real-time site inspections.">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/services.css">
 </head>
 <body>
 
+  <!-- Splash Screen Loading Overlay -->
+  <div id="splash-screen">
+    <div class="splash-content">
+      <div class="splash-logo-container">
+        <img src="/logo.jpg" alt="RME Logo" class="splash-logo">
+        <div class="splash-pulse"></div>
+      </div>
+      <h2 class="splash-title">RUN MY ERRAND</h2>
+      <p class="splash-subtitle">Errands Done Right</p>
+      <div class="splash-loader-bar">
+        <div class="splash-loader-progress"></div>
+      </div>
+      <p class="splash-loading-text">Initializing Concierge Services...</p>
+    </div>
+  </div>
+
   <!-- Premium Header -->
   <header class="header">
     <div class="container header-container">
       <a href="/" class="logo">
-        <div class="logo-circle">RME</div>
+        <img class="logo-image" src="/logo.jpg" alt="RME Logo">
         <div class="logo-text">
           <span>RUN MY ERRAND</span>
           <span>Errands Done Right</span>
@@ -25,13 +41,12 @@
         <a href="/" class="nav-link">Home</a>
         <a href="/services" class="nav-link">Services</a>
         <a href="/dashboard" class="nav-link">Book Now</a>
-        <a href="/admin" class="nav-link">Admin Portal</a>
         <a href="/contact" class="nav-link">Contact</a>
       </nav>
 
       <div class="nav-actions">
         <button class="btn-icon theme-toggle" aria-label="Toggle Theme"></button>
-        <a href="/dashboard" class="btn btn-primary" style="padding: 0.6rem 1.4rem; font-size: 0.85rem;">Client Login</a>
+
         <div class="hamburger">
           <span></span>
           <span></span>
@@ -46,16 +61,15 @@
     <a href="/" class="nav-link">Home</a>
     <a href="/services" class="nav-link">Services</a>
     <a href="/dashboard" class="nav-link">Book Now</a>
-    <a href="/admin" class="nav-link">Admin Portal</a>
     <a href="/contact" class="nav-link">Contact</a>
-    <a href="/dashboard" class="btn btn-primary" style="margin-top: 1rem;">Client Login</a>
+
   </div>
 
   <!-- Services Hero -->
   <section class="services-hero">
     <div class="container">
       <h1>Our Professional Services</h1>
-      <p>Save hours of daily friction. Delegate corporate logistics, confidential banking, home administration, and site inspect audits to our vetted concierge team.</p>
+      <p>Save hours of daily friction. Delegate corporate logistics, confidential documentation, home administration, and site inspect audits to our vetted concierge team.</p>
     </div>
   </section>
 
@@ -90,12 +104,8 @@
               Premium administrative runs
             </div>
           </div>
-          <div class="service-footer">
-            <div class="service-price">
-              <span>Standard Base</span>
-              <span>GHS 60.00</span>
-            </div>
-            <a href="/dashboard?service=Personal & Corporate Errands" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.8rem;">Book Errand</a>
+          <div class="service-footer" style="justify-content: flex-end;">
+            <a href="/dashboard?service=Personal & Corporate Errands" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.8rem; width: 100%; text-align: center;">Book Errand</a>
           </div>
         </div>
 
@@ -126,51 +136,12 @@
               Fragile product courier
             </div>
           </div>
-          <div class="service-footer">
-            <div class="service-price">
-              <span>Standard Base</span>
-              <span>GHS 50.00</span>
-            </div>
-            <a href="/dashboard?service=Parcel Pickup & Delivery" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.8rem;">Book Errand</a>
+          <div class="service-footer" style="justify-content: flex-end;">
+            <a href="/dashboard?service=Parcel Pickup & Delivery" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.8rem; width: 100%; text-align: center;">Book Errand</a>
           </div>
         </div>
 
-        <!-- Card 3: Bill Payments & Bank Runs -->
-        <div class="card service-detail-card">
-          <div class="service-header-row">
-            <div class="service-icon-box">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="4" x2="12" y2="20"></line><line x1="2" y1="12" x2="22" y2="12"></line>
-              </svg>
-            </div>
-            <span class="service-badge">Finance</span>
-          </div>
-          <h3>Bill Payments & Bank Runs</h3>
-          <p class="service-desc">Vetted banking courier services. We execute cash deposits, bulk check drops, utilities handling, and tax check collection.</p>
-          <div class="service-items-list">
-            <div class="service-item-bullet">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              Check deposits & drop-offs
-            </div>
-            <div class="service-item-bullet">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              GRA tax payments compliance
-            </div>
-            <div class="service-item-bullet">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              Post Office runs
-            </div>
-          </div>
-          <div class="service-footer">
-            <div class="service-price">
-              <span>Standard Base</span>
-              <span>GHS 75.00</span>
-            </div>
-            <a href="/dashboard?service=Bill Payments & Bank Runs" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.8rem;">Book Errand</a>
-          </div>
-        </div>
-
-        <!-- Card 4: Travel & Support -->
+        <!-- Card 3: Travel & Support -->
         <div class="card service-detail-card">
           <div class="service-header-row">
             <div class="service-icon-box">
@@ -196,16 +167,12 @@
               Hotel protocol coordination
             </div>
           </div>
-          <div class="service-footer">
-            <div class="service-price">
-              <span>Standard Base</span>
-              <span>GHS 90.00</span>
-            </div>
-            <a href="/dashboard?service=Travel & Support" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.8rem;">Book Errand</a>
+          <div class="service-footer" style="justify-content: flex-end;">
+            <a href="/dashboard?service=Travel & Support" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.8rem; width: 100%; text-align: center;">Book Errand</a>
           </div>
         </div>
 
-        <!-- Card 5: Shopping & Vendor Services -->
+        <!-- Card 4: Shopping & Vendor Services -->
         <div class="card service-detail-card">
           <div class="service-header-row">
             <div class="service-icon-box">
@@ -232,16 +199,12 @@
               Bulky item purchase logistics
             </div>
           </div>
-          <div class="service-footer">
-            <div class="service-price">
-              <span>Standard Base</span>
-              <span>GHS 55.00</span>
-            </div>
-            <a href="/dashboard?service=Shopping & Vendor Services" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.8rem;">Book Errand</a>
+          <div class="service-footer" style="justify-content: flex-end;">
+            <a href="/dashboard?service=Shopping & Vendor Services" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.8rem; width: 100%; text-align: center;">Book Errand</a>
           </div>
         </div>
 
-        <!-- Card 6: House Management -->
+        <!-- Card 5: House Management -->
         <div class="card service-detail-card">
           <div class="service-header-row">
             <div class="service-icon-box">
@@ -267,16 +230,12 @@
               Key collection & security drops
             </div>
           </div>
-          <div class="service-footer">
-            <div class="service-price">
-              <span>Standard Base</span>
-              <span>GHS 80.00</span>
-            </div>
-            <a href="/dashboard?service=House Management" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.8rem;">Book Errand</a>
+          <div class="service-footer" style="justify-content: flex-end;">
+            <a href="/dashboard?service=House Management" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.8rem; width: 100%; text-align: center;">Book Errand</a>
           </div>
         </div>
 
-        <!-- Card 7: Documentation & Compliance Assistance -->
+        <!-- Card 6: Documentation & Compliance Assistance -->
         <div class="card service-detail-card">
           <div class="service-header-row">
             <div class="service-icon-box">
@@ -302,16 +261,12 @@
               Document notary processing
             </div>
           </div>
-          <div class="service-footer">
-            <div class="service-price">
-              <span>Standard Base</span>
-              <span>GHS 120.00</span>
-            </div>
-            <a href="/dashboard?service=Documentation & Compliance Assistance" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.8rem;">Book Errand</a>
+          <div class="service-footer" style="justify-content: flex-end;">
+            <a href="/dashboard?service=Documentation & Compliance Assistance" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.8rem; width: 100%; text-align: center;">Book Errand</a>
           </div>
         </div>
 
-        <!-- Card 8: Site Inspection Updates -->
+        <!-- Card 7: Site Inspection Updates -->
         <div class="card service-detail-card">
           <div class="service-header-row">
             <div class="service-icon-box">
@@ -337,12 +292,8 @@
               Formal inspection PDF logs
             </div>
           </div>
-          <div class="service-footer">
-            <div class="service-price">
-              <span>Standard Base</span>
-              <span>GHS 150.00</span>
-            </div>
-            <a href="/dashboard?service=Site Inspection Updates" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.8rem;">Book Errand</a>
+          <div class="service-footer" style="justify-content: flex-end;">
+            <a href="/dashboard?service=Site Inspection Updates" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.8rem; width: 100%; text-align: center;">Book Errand</a>
           </div>
         </div>
 
@@ -350,88 +301,14 @@
     </div>
   </section>
 
-  <!-- Pricing SLA Guide -->
-  <section class="pricing-info">
-    <div class="container">
-      <div class="section-header">
-        <span>Delivery SLAs</span>
-        <h2>Flexible Urgency Pricing Models</h2>
-        <p>Choose an execution speed that aligns with your timeline. All metrics calculated transparently.</p>
-      </div>
-
-      <div class="pricing-cards">
-        <!-- Tier 1 -->
-        <div class="pricing-card">
-          <div class="tier-name">Standard</div>
-          <div class="tier-price">Base Rate<span> / Job</span></div>
-          <div class="tier-features">
-            <div class="tier-feature">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              Completed within 1 business day
-            </div>
-            <div class="tier-feature">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              Standard courier allocation
-            </div>
-            <div class="tier-feature">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              Full digital tracking slip
-            </div>
-          </div>
-          <a href="/dashboard" class="btn btn-secondary" style="width: 100%;">Create Request</a>
-        </div>
-
-        <!-- Tier 2 -->
-        <div class="pricing-card premium-tier">
-          <div class="tier-name" style="margin-top: 1rem;">Urgent</div>
-          <div class="tier-price">Base + GHS 45<span> / Job</span></div>
-          <div class="tier-features">
-            <div class="tier-feature">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              Guaranteed under 3 hours
-            </div>
-            <div class="tier-feature">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              Priority route sequencing
-            </div>
-            <div class="tier-feature">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              Direct SMS rider updates
-            </div>
-          </div>
-          <a href="/dashboard" class="btn btn-primary" style="width: 100%;">Create Request</a>
-        </div>
-
-        <!-- Tier 3 -->
-        <div class="pricing-card">
-          <div class="tier-name">Express</div>
-          <div class="tier-price">Base + GHS 100<span> / Job</span></div>
-          <div class="tier-features">
-            <div class="tier-feature">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              Dispatched instantly (60-90m)
-            </div>
-            <div class="tier-feature">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              Dedicated non-stop rider
-            </div>
-            <div class="tier-feature">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              Direct rider telephone access
-            </div>
-          </div>
-          <a href="/dashboard" class="btn btn-secondary" style="width: 100%;">Create Request</a>
-        </div>
-      </div>
-    </div>
-  </section>
+  <!-- Pricing SLA Guide Section Removed -->
 
   <!-- Premium Footer -->
   <footer class="footer">
     <div class="container footer-grid">
       <div class="footer-col">
         <a href="/" class="logo">
-          <div class="logo-circle" style="border-color: var(--accent);">RME</div>
+          <img class="logo-image" src="/logo.jpg" alt="RME Logo" style="border-color: var(--accent);">
           <div class="logo-text">
             <span style="color: #FFFFFF;">RUN MY ERRAND</span>
             <span style="color: var(--accent);">Errands Done Right</span>
@@ -457,7 +334,6 @@
           <a href="/">Home</a>
           <a href="/services">Our Services</a>
           <a href="/dashboard">Book an Errand</a>
-          <a href="/admin">Staff Dashboard</a>
           <a href="/contact">Support Contact</a>
         </div>
       </div>

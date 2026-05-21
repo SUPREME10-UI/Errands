@@ -33,10 +33,10 @@ let orders = [
     clientName: "David Mensah",
     clientEmail: "david@ventures.co",
     clientPhone: "+233 50 123 4567",
-    category: "Bill Payments & Bank Runs",
-    description: "Submit tax compliance documents and make bulk utility check deposit at GCB Bank.",
-    pickupLocation: "GCB Bank, Accra High Street",
-    dropoffLocation: "GRA Office, Ring Road",
+    category: "Personal & Corporate Errands",
+    description: "Submit annual returns forms and registration renewals at the Registrar General's Department.",
+    pickupLocation: "RME HQ Office, Airport Area",
+    dropoffLocation: "Registrar General's Department, Ministries",
     urgency: "Standard",
     status: "Completed",
     riderName: "Ama Serwaa",
@@ -168,32 +168,6 @@ app.put('/api/orders/:id', (req, res) => {
   res.json(order);
 });
 
-// Get system analytics/stats
-app.get('/api/stats', (req, res) => {
-  const total = orders.length;
-  const pending = orders.filter(o => o.status === "Pending Assignment").length;
-  const assigned = orders.filter(o => o.status === "Assigned").length;
-  const inProgress = orders.filter(o => o.status === "In Progress").length;
-  const completed = orders.filter(o => o.status === "Completed").length;
-  
-  // Calculate simulated revenue based on urgency and count
-  const revenue = orders.reduce((sum, order) => {
-    let base = 50; // standard
-    if (order.urgency === "Urgent") base = 95;
-    if (order.urgency === "Express") base = 150;
-    return sum + (order.status === "Completed" ? base : base * 0.5); // deposits
-  }, 0);
-
-  res.json({
-    total,
-    pending,
-    assigned,
-    inProgress,
-    completed,
-    revenue: Math.round(revenue),
-    riders: RIDERS.length
-  });
-});
 
 // Post contact messages
 app.post('/api/contact', (req, res) => {
@@ -229,9 +203,6 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-});
 
 app.get('/contact', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'contact.html'));

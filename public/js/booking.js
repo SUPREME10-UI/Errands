@@ -6,6 +6,7 @@ let ordersHistory = [];
 
 document.addEventListener('DOMContentLoaded', () => {
   setupSidebarNavigation();
+  setupCustomCategoryDropdown();
   setupCategoryPicker();
   setupWizardStepper();
   setupDragAndDrop();
@@ -24,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(fetchUserOrders, 4000);
 });
 
-// 1. Sidebar Nav toggling
+// 1. Navigation tab toggling
 function setupSidebarNavigation() {
   const menuNewErrand = document.getElementById('menu-new-errand');
   const menuMyErrands = document.getElementById('menu-my-errands');
@@ -40,9 +41,8 @@ function setupSidebarNavigation() {
       menuMyErrands.classList.remove('active');
       bookingFlowSection.style.display = 'grid';
       myErrandsSection.style.display = 'none';
-      titleText.innerText = 'Book a New Errand';
-      subtitleText.innerText = 'Fill out our custom logistics form to get dispatched in real time.';
-      closeMobileSidebar();
+      if (titleText) titleText.innerText = 'Book a New Errand';
+      if (subtitleText) subtitleText.innerText = 'Fill out our custom logistics form to get dispatched in real time.';
     });
 
     menuMyErrands.addEventListener('click', () => {
@@ -50,37 +50,82 @@ function setupSidebarNavigation() {
       menuNewErrand.classList.remove('active');
       bookingFlowSection.style.display = 'none';
       myErrandsSection.style.display = 'block';
-      titleText.innerText = 'Active Errands & Tracking';
-      subtitleText.innerText = 'Track the live delivery progress and courier state in real time.';
-      closeMobileSidebar();
+      if (titleText) titleText.innerText = 'Active Errands & Tracking';
+      if (subtitleText) subtitleText.innerText = 'Track the live delivery progress and courier state in real time.';
       fetchUserOrders(); // Reload orders immediately
-    });
-  }
-
-  // Mobile sidebar support
-  const toggleBtn = document.getElementById('sidebar-toggle-btn');
-  const sidebar = document.querySelector('.db-sidebar');
-  if (toggleBtn && sidebar) {
-    toggleBtn.style.display = 'flex'; // Make visible
-    toggleBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      sidebar.classList.toggle('active');
-    });
-    
-    // Close sidebar clicking outside
-    document.addEventListener('click', (e) => {
-      if (sidebar.classList.contains('active') && !sidebar.contains(e.target) && e.target !== toggleBtn) {
-        sidebar.classList.remove('active');
-      }
     });
   }
 }
 
-function closeMobileSidebar() {
-  const sidebar = document.querySelector('.db-sidebar');
-  if (sidebar) {
-    sidebar.classList.remove('active');
-  }
+// 1b. Custom Category Dropdown
+function setupCustomCategoryDropdown() {
+  const wrapper = document.getElementById('category-custom-select');
+  const trigger = document.getElementById('category-trigger');
+  const dropdown = document.getElementById('category-dropdown');
+  const hiddenInput = document.getElementById('field-category');
+  const labelEl = document.getElementById('category-label');
+  const descEl = document.getElementById('category-desc');
+  const iconEl = document.getElementById('category-icon');
+
+  if (!wrapper || !trigger || !dropdown) return;
+
+  const options = dropdown.querySelectorAll('.custom-select-option');
+
+  // Toggle open/close on trigger click
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = wrapper.classList.contains('open');
+    wrapper.classList.toggle('open', !isOpen);
+    trigger.setAttribute('aria-expanded', String(!isOpen));
+  });
+
+  // Keyboard support
+  trigger.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      trigger.click();
+    }
+    if (e.key === 'Escape') {
+      wrapper.classList.remove('open');
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Select option on click
+  options.forEach(option => {
+    option.addEventListener('click', (e) => {
+      e.stopPropagation();
+
+      const value = option.getAttribute('data-value');
+      const desc  = option.getAttribute('data-desc') || '';
+      const optIconSVG = option.querySelector('.option-icon')?.innerHTML || '';
+
+      // Update trigger display
+      if (labelEl) labelEl.textContent = value;
+      if (descEl)  descEl.textContent  = desc;
+      if (iconEl)  iconEl.innerHTML    = optIconSVG;
+
+      // Update hidden input
+      if (hiddenInput) hiddenInput.value = value;
+
+      // Toggle active state
+      options.forEach(o => o.classList.remove('active'));
+      option.classList.add('active');
+
+      // Close dropdown
+      wrapper.classList.remove('open');
+      trigger.setAttribute('aria-expanded', 'false');
+
+      // Recalculate costs
+      calculateCosts();
+    });
+  });
+
+  // Close when clicking outside
+  document.addEventListener('click', () => {
+    wrapper.classList.remove('open');
+    trigger.setAttribute('aria-expanded', 'false');
+  });
 }
 
 // 2. Preselected service from URL query params
@@ -88,39 +133,26 @@ function checkPreselectedService() {
   const params = new URLSearchParams(window.location.search);
   const serviceParam = params.get('service');
   if (serviceParam) {
-    const card = Array.from(document.querySelectorAll('.picker-card')).find(c => c.getAttribute('data-value') === serviceParam);
-    if (card) {
-      // Trigger card select
-      document.querySelectorAll('.picker-card').forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      
-      const categoryField = document.getElementById('field-category');
-      if (categoryField) categoryField.value = serviceParam;
-      
-      calculateCosts();
-      showToast(`Auto-selected: ${serviceParam}`, 'info');
+    const categoryField = document.getElementById('field-category');
+    if (categoryField) {
+      const option = Array.from(categoryField.options).find(opt => opt.value === serviceParam);
+      if (option) {
+        categoryField.value = serviceParam;
+        calculateCosts();
+        showToast(`Auto-selected: ${serviceParam}`, 'info');
+      }
     }
   }
 }
 
-// 3. Category selector picker cards
+// 3. Category selector picker cards / dropdown
 function setupCategoryPicker() {
-  const pickerCards = document.querySelectorAll('.picker-card');
   const categoryField = document.getElementById('field-category');
-
-  pickerCards.forEach(card => {
-    card.addEventListener('click', () => {
-      pickerCards.forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-
-      const val = card.getAttribute('data-value');
-      if (categoryField) {
-        categoryField.value = val;
-      }
-      
+  if (categoryField) {
+    categoryField.addEventListener('change', () => {
       calculateCosts();
     });
-  });
+  }
 
   // Listener to urgency dropdown
   const urgencyField = document.getElementById('field-urgency');
@@ -224,8 +256,12 @@ function validateStep(step) {
 
 // Cost Calculator Logic
 function calculateCosts() {
-  const selectedCategoryCard = document.querySelector('.picker-card.selected');
-  const baseRate = selectedCategoryCard ? parseFloat(selectedCategoryCard.getAttribute('data-base')) : 50;
+  // Read base rate from the active custom-select option's data-base attribute
+  const activeOption = document.querySelector('#category-dropdown .custom-select-option.active');
+  let baseRate = 50;
+  if (activeOption) {
+    baseRate = parseFloat(activeOption.getAttribute('data-base')) || 50;
+  }
 
   const urgencyVal = document.getElementById('field-urgency') ? document.getElementById('field-urgency').value : 'Standard';
   let urgencySurcharge = 0;
@@ -237,12 +273,21 @@ function calculateCosts() {
   const tax = subtotal * 0.05; // 5% VAT
   const total = subtotal + tax;
 
-  // Render values
-  document.getElementById('summary-base-val').innerText = `GHS ${baseRate.toFixed(2)}`;
-  document.getElementById('summary-urgency-label').innerText = urgencyVal;
-  document.getElementById('summary-urgency-val').innerText = `GHS ${urgencySurcharge.toFixed(2)}`;
-  document.getElementById('summary-tax-val').innerText = `GHS ${tax.toFixed(2)}`;
-  document.getElementById('summary-total-val').innerText = `GHS ${total.toFixed(2)}`;
+  // Render values safely if elements exist in DOM
+  const baseValEl = document.getElementById('summary-base-val');
+  if (baseValEl) baseValEl.innerText = `GHS ${baseRate.toFixed(2)}`;
+
+  const urgencyLabelEl = document.getElementById('summary-urgency-label');
+  if (urgencyLabelEl) urgencyLabelEl.innerText = urgencyVal;
+
+  const urgencyValEl = document.getElementById('summary-urgency-val');
+  if (urgencyValEl) urgencyValEl.innerText = `GHS ${urgencySurcharge.toFixed(2)}`;
+
+  const taxValEl = document.getElementById('summary-tax-val');
+  if (taxValEl) taxValEl.innerText = `GHS ${tax.toFixed(2)}`;
+
+  const totalValEl = document.getElementById('summary-total-val');
+  if (totalValEl) totalValEl.innerText = `GHS ${total.toFixed(2)}`;
 }
 
 // 5. Drag and Drop support
@@ -347,8 +392,24 @@ function submitErrandBooking() {
     document.getElementById('errand-wizard-form').reset();
     goToStep(1);
     
-    // Transition to Active Errands tab
-    document.getElementById('menu-my-errands').click();
+    // Transition to Active Errands tab if it exists, otherwise toggle DOM sections directly
+    const menuMyErrands = document.getElementById('menu-my-errands');
+    if (menuMyErrands) {
+      menuMyErrands.click();
+    } else {
+      const bookingFlowSection = document.getElementById('booking-flow-section');
+      const myErrandsSection = document.getElementById('my-errands-section');
+      const titleText = document.getElementById('db-title-text');
+      const subtitleText = document.getElementById('db-subtitle-text');
+
+      if (bookingFlowSection) bookingFlowSection.style.display = 'none';
+      if (myErrandsSection) {
+        myErrandsSection.style.display = 'block';
+        fetchUserOrders();
+      }
+      if (titleText) titleText.innerText = 'Active Errands & Tracking';
+      if (subtitleText) subtitleText.innerText = 'Track the live delivery progress and courier state in real time.';
+    }
   })
   .catch(err => {
     console.error(err);

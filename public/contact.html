@@ -10,11 +10,27 @@
 </head>
 <body>
 
+  <!-- Splash Screen Loading Overlay -->
+  <div id="splash-screen">
+    <div class="splash-content">
+      <div class="splash-logo-container">
+        <img src="/logo.jpg" alt="RME Logo" class="splash-logo">
+        <div class="splash-pulse"></div>
+      </div>
+      <h2 class="splash-title">RUN MY ERRAND</h2>
+      <p class="splash-subtitle">Errands Done Right</p>
+      <div class="splash-loader-bar">
+        <div class="splash-loader-progress"></div>
+      </div>
+      <p class="splash-loading-text">Initializing Concierge Services...</p>
+    </div>
+  </div>
+
   <!-- Premium Header -->
   <header class="header">
     <div class="container header-container">
       <a href="/" class="logo">
-        <div class="logo-circle">RME</div>
+        <img class="logo-image" src="/logo.jpg" alt="RME Logo">
         <div class="logo-text">
           <span>RUN MY ERRAND</span>
           <span>Errands Done Right</span>
@@ -25,7 +41,6 @@
         <a href="/" class="nav-link">Home</a>
         <a href="/services" class="nav-link">Services</a>
         <a href="/dashboard" class="nav-link">Book Now</a>
-        <a href="/admin" class="nav-link">Admin Portal</a>
         <a href="/contact" class="nav-link">Contact</a>
       </nav>
 
@@ -46,7 +61,6 @@
     <a href="/" class="nav-link">Home</a>
     <a href="/services" class="nav-link">Services</a>
     <a href="/dashboard" class="nav-link">Book Now</a>
-    <a href="/admin" class="nav-link">Admin Portal</a>
     <a href="/contact" class="nav-link">Contact</a>
     <a href="/dashboard" class="btn btn-primary" style="margin-top: 1rem;">Client Login</a>
   </div>
@@ -128,7 +142,7 @@
       </div>
 
       <!-- Right Column: Form submission -->
-      <div class="card" style="padding: 2.5rem 2rem;">
+      <div class="card contact-form-card">
         <h2 style="font-size: 1.5rem; color: var(--primary); margin-bottom: 0.5rem;">Send a Message</h2>
         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem;">Fill out our direct inquiry ticket. Our response SLA is guaranteed within 60 minutes during business hours.</p>
         
@@ -171,7 +185,7 @@
     <div class="container footer-grid">
       <div class="footer-col">
         <a href="/" class="logo">
-          <div class="logo-circle" style="border-color: var(--accent);">RME</div>
+          <img class="logo-image" src="/logo.jpg" alt="RME Logo" style="border-color: var(--accent);">
           <div class="logo-text">
             <span style="color: #FFFFFF;">RUN MY ERRAND</span>
             <span style="color: var(--accent);">Errands Done Right</span>
@@ -197,7 +211,6 @@
           <a href="/">Home</a>
           <a href="/services">Our Services</a>
           <a href="/dashboard">Book an Errand</a>
-          <a href="/admin">Staff Dashboard</a>
           <a href="/contact">Support Contact</a>
         </div>
       </div>

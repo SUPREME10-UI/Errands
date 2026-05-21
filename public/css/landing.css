@@ -220,11 +220,21 @@
   .hero-visual {
     min-height: 380px;
   }
+  .floating-card {
+    display: none; /* Hide floating widgets on tablets to prevent horizontal overflow */
+  }
+}
+
+@media (max-width: 768px) {
+  .why-us-image svg {
+    height: auto;
+    max-height: 340px;
+  }
 }
 
 @media (max-width: 576px) {
   .hero-headline {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
   }
   .hero-cta {
     flex-direction: column;
@@ -233,8 +243,37 @@
     flex-direction: column;
     gap: 1.5rem;
   }
-  .floating-card {
-    display: none; /* Hide floating widgets on very small screens to avoid overlap */
+  .hero-visual {
+    min-height: 280px;
+  }
+  .why-us-badge {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.75rem 1.25rem;
+  }
+  .why-us-badge span:first-child {
+    font-size: 1.5rem;
+  }
+  .why-us-badge span:last-child {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .hero-headline {
+    font-size: 1.8rem;
+  }
+  .hero-subheadline {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .app-phone-mockup {
+    width: 250px;
+    height: 500px;
+    border-width: 8px;
   }
 }
 

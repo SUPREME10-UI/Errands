@@ -10,11 +10,27 @@
 </head>
 <body>
 
+  <!-- Splash Screen Loading Overlay -->
+  <div id="splash-screen">
+    <div class="splash-content">
+      <div class="splash-logo-container">
+        <img src="/logo.jpg" alt="RME Logo" class="splash-logo">
+        <div class="splash-pulse"></div>
+      </div>
+      <h2 class="splash-title">RUN MY ERRAND</h2>
+      <p class="splash-subtitle">Errands Done Right</p>
+      <div class="splash-loader-bar">
+        <div class="splash-loader-progress"></div>
+      </div>
+      <p class="splash-loading-text">Initializing Concierge Services...</p>
+    </div>
+  </div>
+
   <!-- Premium Header -->
   <header class="header">
     <div class="container header-container">
       <a href="/" class="logo">
-        <div class="logo-circle">RME</div>
+        <img class="logo-image" src="/logo.jpg" alt="RME Logo">
         <div class="logo-text">
           <span>RUN MY ERRAND</span>
           <span>Errands Done Right</span>
@@ -25,7 +41,7 @@
         <a href="/" class="nav-link">Home</a>
         <a href="/services" class="nav-link">Services</a>
         <a href="/dashboard" class="nav-link">Book Now</a>
-        <a href="/admin" class="nav-link">Admin Portal</a>
+
         <a href="/contact" class="nav-link">Contact</a>
       </nav>
 
@@ -33,7 +49,7 @@
         <button class="btn-icon theme-toggle" aria-label="Toggle Theme">
           <!-- Theme toggle icon (dark/light) will be inserted by JS -->
         </button>
-        <a href="/dashboard" class="btn btn-primary" style="padding: 0.6rem 1.4rem; font-size: 0.85rem;">Client Login</a>
+
         <div class="hamburger">
           <span></span>
           <span></span>
@@ -48,9 +64,9 @@
     <a href="/" class="nav-link">Home</a>
     <a href="/services" class="nav-link">Services</a>
     <a href="/dashboard" class="nav-link">Book Now</a>
-    <a href="/admin" class="nav-link">Admin Portal</a>
+
     <a href="/contact" class="nav-link">Contact</a>
-    <a href="/dashboard" class="btn btn-primary" style="margin-top: 1rem;">Client Login</a>
+
   </div>
 
   <!-- Hero Section -->
@@ -65,7 +81,7 @@
           Reliable Logistics Partner
         </div>
         <h1 class="hero-headline">Need Help With Your <span>To-Do List?</span></h1>
-        <p class="hero-subheadline">“Relax, we’ve got it covered.” We manage your personal, corporate, banking, shopping, and logistic tasks with absolute trust and efficiency.</p>
+        <p class="hero-subheadline">“Relax, we’ve got it covered.” We manage your personal, corporate, shopping, and logistic tasks with absolute trust and efficiency.</p>
         <div class="hero-cta">
           <a href="/dashboard" class="btn btn-primary">
             Book an Errand
@@ -157,8 +173,8 @@
             </svg>
           </div>
           <div class="floating-info">
-            <span>Bank Deposit Done</span>
-            <span>Completed 4 mins ago</span>
+            <span>Shopping Complete</span>
+            <span>Delivered 4 mins ago</span>
           </div>
         </div>
 
@@ -182,14 +198,6 @@
     <div class="container">
       <p class="trusted-title">Trusted By Corporate Businesses & Individuals</p>
       <div class="trusted-logos">
-        <div class="trusted-logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
-          Standard Chartered
-        </div>
-        <div class="trusted-logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-          GCB Bank
-        </div>
         <div class="trusted-logo">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path></svg>
           Melcom Group
@@ -222,21 +230,6 @@
           </div>
           <h3>Parcel Pickup & Delivery</h3>
           <p>Instant pick-ups and deliveries of crucial documents, shopping bundles, and fragile parcels across the city.</p>
-          <a href="/services" class="feature-link">
-            Learn more 
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-          </a>
-        </div>
-
-        <!-- Feature Card 2 -->
-        <div class="card feature-card">
-          <div class="feature-icon-wrapper">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="4" x2="12" y2="20"></line><line x1="2" y1="12" x2="22" y2="12"></line>
-            </svg>
-          </div>
-          <h3>Bill Payments & Bank Runs</h3>
-          <p>Secure deposits, check clearance drops, utility bill handling, and administrative queuing at institutions.</p>
           <a href="/services" class="feature-link">
             Learn more 
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
@@ -307,7 +300,7 @@
             </div>
             <div class="why-us-info">
               <h3>Vetted Professional Riders</h3>
-              <p>Every single courier on our team is carefully background-checked, insured, and thoroughly trained to handle confidential materials and bank runs.</p>
+              <p>Every single courier on our team is carefully background-checked, insured, and thoroughly trained to handle confidential materials and sensitive deliveries.</p>
             </div>
           </div>
           
@@ -337,104 +330,6 @@
     </div>
   </section>
 
-  <!-- Mobile App Preview Mockup -->
-  <section class="app-preview">
-    <div class="container app-grid">
-      <div class="app-details">
-        <h2>Errands Under Control. Anywhere, Anytime.</h2>
-        <p>Book rides, schedule pickups, verify site compliance photographs, and coordinate domestic support chores directly from our responsive web application portal.</p>
-        <div class="app-store-btns">
-          <div class="store-btn">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2zm1 14h-2v-4h2v4zm0-6h-2V8h2v2z"></path>
-            </svg>
-            <div class="store-text">
-              <span>Download on the</span>
-              <span>App Store</span>
-            </div>
-          </div>
-          
-          <div class="store-btn">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-            <div class="store-text">
-              <span>Get it on</span>
-              <span>Google Play</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="app-mockup-wrapper">
-        <div class="app-phone-mockup">
-          <div class="app-phone-screen">
-            <div class="app-screen-header">
-              <span>9:41 AM</span>
-              <span class="app-screen-title">Active Errand</span>
-              <span>100%</span>
-            </div>
-            
-            <div class="app-tracker-card">
-              <div class="tracker-heading">
-                <span class="tracker-id">RME-9021</span>
-                <span class="tracker-eta">ETA: 12 MINS</span>
-              </div>
-              <p style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.75); margin-bottom: 0.75rem;">Document Delivery: GRA to Airport</p>
-              
-              <div class="tracker-timeline">
-                <div class="timeline-step completed">
-                  <div class="timeline-dot"></div>
-                  <div class="timeline-step-info">
-                    <span>Errand Submitted</span>
-                    <span>10:14 AM</span>
-                  </div>
-                </div>
-                
-                <div class="timeline-step completed">
-                  <div class="timeline-dot"></div>
-                  <div class="timeline-step-info">
-                    <span>Rider Kwame Vetted</span>
-                    <span>10:20 AM</span>
-                  </div>
-                </div>
-
-                <div class="timeline-step active">
-                  <div class="timeline-dot"></div>
-                  <div class="timeline-step-info">
-                    <span>Out for Delivery</span>
-                    <span>In Transit - Ring Road</span>
-                  </div>
-                </div>
-
-                <div class="timeline-step">
-                  <div class="timeline-dot"></div>
-                  <div class="timeline-step-info">
-                    <span>Arrived & Signed</span>
-                    <span>Pending Delivery</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="app-rider-widget">
-              <div class="app-rider-img">KM</div>
-              <div class="app-rider-details">
-                <span>Kwame Mensah</span>
-                <span>Active RME Courier</span>
-              </div>
-              <div class="app-call-btn">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- Testimonials Section -->
   <section class="testimonials">
     <div class="container">
@@ -455,7 +350,7 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
           </div>
-          <p class="quote">"I run a corporate consulting firm in Airport Residential, and we use RME exclusively for banking and tax compliance submissions. Their reliability is unmatched in Accra. The dashboard status timeline makes tracking crucial paperwork stress-free."</p>
+          <p class="quote">"I run a corporate consulting firm in Airport Residential, and we use RME exclusively for document deliveries and compliance submissions. Their reliability is unmatched in Accra. The dashboard status timeline makes tracking crucial paperwork stress-free."</p>
           <div class="client-info">
             <div class="client-avatar">EA</div>
             <div class="client-details">
@@ -532,13 +427,13 @@
         <!-- FAQ 2 -->
         <div class="faq-item">
           <div class="faq-question">
-            Are my packages and bank deposits insured?
+            Are my packages and deliveries insured?
             <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </div>
           <div class="faq-answer">
-            Yes. Every RME order is backed by premium logistical insurance up to GHS 10,000 for valuables and documents. Bank runs and cash-in-transit are handled with dedicated safety checks, strict dual-signature validation, and real-time bank slip uploads.
+            Yes. Every RME order is backed by premium logistical insurance up to GHS 10,000 for valuables and documents. All deliveries are handled with dedicated safety checks, strict dual-signature validation, and real-time tracking updates.
           </div>
         </div>
 
@@ -563,7 +458,7 @@
     <div class="container footer-grid">
       <div class="footer-col">
         <a href="/" class="logo">
-          <div class="logo-circle" style="border-color: var(--accent);">RME</div>
+          <img class="logo-image" src="/logo.jpg" alt="RME Logo" style="border-color: var(--accent);">
           <div class="logo-text">
             <span style="color: #FFFFFF;">RUN MY ERRAND</span>
             <span style="color: var(--accent);">Errands Done Right</span>
@@ -589,7 +484,7 @@
           <a href="/">Home</a>
           <a href="/services">Our Services</a>
           <a href="/dashboard">Book an Errand</a>
-          <a href="/admin">Staff Dashboard</a>
+
           <a href="/contact">Support Contact</a>
         </div>
       </div>
