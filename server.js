@@ -217,6 +217,10 @@ app.get('/contact', (req, res) => {
 });
 
 // Start Server
-app.listen(PORT, () => {
-  console.log(`Run My Errand server is running beautifully at http://localhost:${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Run My Errand server is running beautifully at http://localhost:${PORT}`);
+  });
+}
+
+export default app;
