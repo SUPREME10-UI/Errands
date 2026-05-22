@@ -3,14 +3,20 @@
   "version": "1.0.0",
   "description": "Premium, startup-grade web application for Run My Errand services",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "build": "echo 'No build required for this Express app'"
+    "dev:client": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "express": "^4.19.2"
   },
   "author": "Antigravity",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^6.3.5"
+  }
 }
