@@ -2,6 +2,18 @@
   "cleanUrls": true,
   "rewrites": [
     {
+      "source": "/services",
+      "destination": "/services.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/contact.html"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/index.js"
     }
