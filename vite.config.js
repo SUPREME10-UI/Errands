@@ -12,6 +12,8 @@ export default defineConfig({
         services:  resolve(__dirname, 'public/services.html'),
         dashboard: resolve(__dirname, 'public/dashboard.html'),
         contact:   resolve(__dirname, 'public/contact.html'),
+        privacy:   resolve(__dirname, 'public/privacy.html'),
+        terms:     resolve(__dirname, 'public/terms.html'),
       },
     },
   },

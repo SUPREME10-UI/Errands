@@ -216,6 +216,14 @@ app.get('/contact', (req, res) => {
   res.sendFile(path.join(staticDir, 'contact.html'));
 });
 
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(staticDir, 'privacy.html'));
+});
+
+app.get('/terms', (req, res) => {
+  res.sendFile(path.join(staticDir, 'terms.html'));
+});
+
 // Start Server
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {
