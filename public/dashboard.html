@@ -68,55 +68,6 @@
   <div class="db-container" style="padding-top: 80px;">
     <!-- Main Content Panel (Full Width) -->
     <main class="db-main">
-      <!-- Dashboard Toolbar / Sub-navigation -->
-      <div class="db-sub-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 1rem;">
-        <!-- Tabs -->
-        <nav class="db-top-menu">
-          <a id="menu-new-errand" class="db-menu-link active">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 5v14M5 12h14"></path>
-            </svg>
-            <span>New Errand</span>
-          </a>
-          <a id="menu-my-errands" class="db-menu-link">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9l2 2 4-4"></path>
-            </svg>
-            <span>Active Tracker</span>
-          </a>
-        </nav>
-
-        <!-- Right Side Alerts & Status -->
-        <div style="display: flex; align-items: center; gap: 1.25rem;">
-          <!-- Notifications Bell -->
-          <div class="db-noti-bell" id="bell-container">
-            <button class="btn-icon" style="background: var(--bg-card); border: 1px solid var(--border-color); width: 40px; height: 40px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main);">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-              </svg>
-            </button>
-            <div class="db-noti-badge" id="noti-badge"></div>
-            
-            <!-- Notification list -->
-            <div class="db-noti-dropdown" id="noti-dropdown">
-              <div class="db-noti-header">
-                <span>System Alerts</span>
-                <span style="font-size: 0.7rem; color: var(--text-light); font-weight: 500; cursor: pointer;" id="noti-clear">Mark read</span>
-              </div>
-              <div class="db-noti-list" id="noti-list">
-                <div class="db-noti-item">
-                  <div class="db-noti-item-dot"></div>
-                  <div class="db-noti-item-content">
-                    <span class="db-noti-item-title">Welcome to RME!</span>
-                    <span class="db-noti-item-time">Just now</span>
-                  </div>
-                </div>
-              </div>
-              <div class="db-noti-footer">View details in active tracker</div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- BOOK AN ERRAND FLOW -->
       <div id="booking-flow-section" class="booking-layout">
