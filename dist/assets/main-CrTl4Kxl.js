@@ -17,7 +17,7 @@
     `),r.innerHTML=`
     ${i}
     <span>${e}</span>
-  `,n.appendChild(r),setTimeout(()=>{r.classList.add(`toast-closing`),r.addEventListener(`animationend`,()=>{r.remove()})},4e3)}function t(){let t=localStorage.getItem(`theme`)||`light`;document.documentElement.setAttribute(`data-theme`,t),document.querySelectorAll(`.theme-toggle`).forEach(t=>{t.addEventListener(`click`,()=>{let t=document.documentElement.getAttribute(`data-theme`)===`dark`?`light`:`dark`;document.documentElement.setAttribute(`data-theme`,t),localStorage.setItem(`theme`,t),e(`Switched to ${t} mode!`,`success`),n(t)})}),n(t)}function n(e){document.querySelectorAll(`.theme-toggle`).forEach(t=>{e===`dark`?t.innerHTML=`
+  `,n.appendChild(r),setTimeout(()=>{r.classList.add(`toast-closing`),r.addEventListener(`animationend`,()=>{r.remove()})},4e3)}window.showToast=e;function t(){let t=localStorage.getItem(`theme`)||`light`;document.documentElement.setAttribute(`data-theme`,t),document.querySelectorAll(`.theme-toggle`).forEach(t=>{t.addEventListener(`click`,()=>{let t=document.documentElement.getAttribute(`data-theme`)===`dark`?`light`:`dark`;document.documentElement.setAttribute(`data-theme`,t),localStorage.setItem(`theme`,t),e(`Switched to ${t} mode!`,`success`),n(t)})}),n(t)}function n(e){document.querySelectorAll(`.theme-toggle`).forEach(t=>{e===`dark`?t.innerHTML=`
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
           <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>

@@ -125,6 +125,7 @@ function showToast(message, type = 'info') {
     });
   }, 4000);
 }
+window.showToast = showToast;
 
 // Theme handling
 function setupGlobalTheme() {
