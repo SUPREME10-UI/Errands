@@ -3,6 +3,7 @@
 let currentStep = 1;
 const totalSteps = 4;
 let ordersHistory = [];
+let selectedFiles = [];
 
 document.addEventListener('DOMContentLoaded', () => {
   setupSidebarNavigation();
@@ -328,6 +329,8 @@ function setupDragAndDrop() {
     if (files.length === 0) return;
     
     Array.from(files).forEach(file => {
+      selectedFiles.push(file);
+      
       const chip = document.createElement('div');
       chip.style.cssText = `
         background: rgba(0, 82, 255, 0.08);
@@ -345,7 +348,10 @@ function setupDragAndDrop() {
         <span class="remove-file" style="cursor:pointer; font-weight:700;">&times;</span>
       `;
       
-      chip.querySelector('.remove-file').addEventListener('click', () => chip.remove());
+      chip.querySelector('.remove-file').addEventListener('click', () => {
+        selectedFiles = selectedFiles.filter(f => f !== file);
+        chip.remove();
+      });
       listPreview.appendChild(chip);
     });
     
@@ -372,7 +378,9 @@ function submitErrandBooking() {
     clientPhone: "+233 24 412 3456"
   };
 
-  // Submit via API
+  showToast("Submitting your errand booking...", "info");
+
+  // Submit via local API first for real-time tracking dashboard
   fetch('/api/orders', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -383,13 +391,48 @@ function submitErrandBooking() {
     return res.json();
   })
   .then(newOrder => {
-    showToast(`Errand ${newOrder.id} booked successfully! Dispatching rider...`, 'success');
+    // FormSubmit integration to send to support@runmyerrand.com
+    const formData = new FormData();
+    formData.append('_subject', `New Errand Booked: ${newOrder.id} [${urgency}]`);
+    formData.append('Order ID', newOrder.id);
+    formData.append('Category', category);
+    formData.append('Urgency Status', urgency);
+    formData.append('Pickup Address', pickupLocation);
+    formData.append('Dropoff Address', dropoffLocation);
+    formData.append('Detailed Description', description);
+    formData.append('Client Name', "Abena Osei");
+    formData.append('Client Email', "abena@example.com");
+    formData.append('Client Phone', "+233 24 412 3456");
+    formData.append('_captcha', 'false');
+
+    // Attach all files registered during setupDragAndDrop
+    selectedFiles.forEach((file, index) => {
+      formData.append(`file_${index}`, file);
+    });
+
+    return fetch('https://formsubmit.co/ajax/support@runmyerrand.com', {
+      method: 'POST',
+      body: formData
+    })
+    .then(emailRes => {
+      if (!emailRes.ok) {
+        console.warn("Local booking succeeded, but email notification had delivery issues.");
+      }
+      return newOrder;
+    });
+  })
+  .then(newOrder => {
+    showToast(`Errand ${newOrder.id} booked successfully and sent to email!`, 'success');
     
     // Add systems alert
     addSystemAlert(`Rider allocation underway for your new order ${newOrder.id}.`, 'info');
     
-    // Reset wizard
+    // Reset wizard form & file arrays
     document.getElementById('errand-wizard-form').reset();
+    const listPreview = document.getElementById('file-list-preview');
+    if (listPreview) listPreview.innerHTML = '';
+    selectedFiles = [];
+    
     goToStep(1);
     
     // Transition to Active Errands tab if it exists, otherwise toggle DOM sections directly
