@@ -35,11 +35,9 @@ export default function Header() {
             
             <NavLink to="/book-now" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Book Now</NavLink>
             {currentUser && (
-              userData?.role === 'admin' ? (
-                <NavLink to="/admin" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Admin Panel</NavLink>
-              ) : (
-                <NavLink to="/dashboard" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Dashboard</NavLink>
-              )
+              <NavLink to={userData?.role === 'admin' ? "/admin" : "/dashboard"} className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+                {userData?.role === 'admin' ? "Admin Panel" : "Dashboard"}
+              </NavLink>
             )}
 
             <NavLink to="/contact" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Contact</NavLink>

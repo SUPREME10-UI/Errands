@@ -3,6 +3,7 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import nodemailer from 'nodemailer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,6 +18,42 @@ const staticDir = fs.existsSync(path.join(__dirname, 'dist'))
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ─── Email Transporter Setup ────────────────────────────────────────────────
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
+// ─── Send Email Endpoint ────────────────────────────────────────────────────
+app.post('/api/send-email', async (req, res) => {
+  try {
+    const { to, subject, html } = req.body;
+    
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.warn("SMTP Credentials not configured! Email skipped.");
+      return res.status(200).json({ success: true, message: 'Skipped (No SMTP credentials)' });
+    }
+
+    const recipients = Array.isArray(to) ? to.join(', ') : to;
+    
+    const mailOptions = {
+      from: `"Errands Support" <${process.env.SMTP_USER}>`,
+      to: recipients,
+      subject,
+      html,
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ success: true, message: 'Email sent successfully' });
+  } catch (error) {
+    console.error('Email send error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 // ─── Dynamic env-config endpoint ─────────────────────────────────────────────
 // Exposes only VITE_* env vars to the browser as window.__ENV__

@@ -24,10 +24,41 @@ export default function Contact() {
     setLoading(true);
     setStatus({ type: 'info', message: 'Submitting your support ticket...' });
 
+    const isDemo = !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY.includes('YOUR_API_KEY');
+    if (isDemo) {
+      try {
+        const msgs = JSON.parse(localStorage.getItem('demo_contact_messages') || '[]');
+        const newMsg = {
+          id: `msg-${Date.now()}`,
+          ...formData,
+          status: 'unread',
+          createdAt: new Date().toISOString()
+        };
+        msgs.push(newMsg);
+        localStorage.setItem('demo_contact_messages', JSON.stringify(msgs));
+
+        setStatus({ type: 'success', message: "Support ticket submitted! We'll reply within 60 mins." });
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: ''
+        });
+      } catch (error) {
+        console.error("Error submitting contact message in demo mode:", error);
+        setStatus({ type: 'danger', message: 'Error submitting contact ticket. Please retry.' });
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     try {
       // Save directly to Firestore contactMessages collection
       await addDoc(collection(db, "contactMessages"), {
         ...formData,
+        status: 'unread',
         createdAt: new Date().toISOString()
       });
 

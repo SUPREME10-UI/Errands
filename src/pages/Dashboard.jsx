@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useAuth } from '../context/AuthContext';
+import { getMessages, sendMessage } from '../lib/dbHelper';
 import "./dashboard.css";
 import "./booking.css";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
@@ -13,7 +14,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   // Navigation tab state
-  const [activeTab, setActiveTab] = useState('tracking'); // 'tracking' or 'book'
+  const [activeTab, setActiveTab] = useState('tracking'); // 'tracking', 'book', 'history'
 
   // Booking Wizard states
   const [currentStep, setCurrentStep] = useState(1);
@@ -35,6 +36,29 @@ export default function Dashboard() {
   const [bellActive, setBellActive] = useState(false);
   const [toast, setToast] = useState(null);
 
+  // Chat state
+  const [chatOrderId, setChatOrderId] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+
+  const loadChat = async (orderId) => {
+    if (chatOrderId === orderId) {
+      setChatOrderId(null); // toggle off
+      return;
+    }
+    setChatOrderId(orderId);
+    const msgs = await getMessages(orderId);
+    setMessages(msgs);
+  };
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !chatOrderId) return;
+    await sendMessage(chatOrderId, newMessage, currentUser?.displayName || 'Client', 'client');
+    setNewMessage('');
+    const msgs = await getMessages(chatOrderId);
+    setMessages(msgs);
+  };
+
   const fileInputRef = useRef(null);
   const categoryWrapperRef = useRef(null);
 
@@ -51,6 +75,27 @@ export default function Dashboard() {
   // Load and sync user orders
   const fetchUserOrders = async () => {
     if (!currentUser) return;
+    const isDemo = !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY.includes('YOUR_API_KEY') || currentUser.uid.startsWith('demo-');
+    
+    if (isDemo) {
+      const allOrders = JSON.parse(localStorage.getItem('demo_orders') || '[]');
+      const userOrders = allOrders.filter(o => o.userId === currentUser.uid);
+      userOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      
+      if (orders.length > 0) {
+        userOrders.forEach(order => {
+          const matchingOld = orders.find(o => o.id === order.id);
+          if (matchingOld && matchingOld.status !== order.status) {
+            triggerToast(`Errand ${order.id} status updated to: ${order.status}!`, 'warning');
+            addSystemAlert(`Errand ${order.id} is now [${order.status}]. Rider assigned: ${order.riderName || 'Pending'}.`);
+          }
+        });
+      }
+      setOrders(userOrders);
+      setOrdersLoading(false);
+      return;
+    }
+
     try {
       const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid));
       const querySnapshot = await getDocs(q);
@@ -193,32 +238,60 @@ export default function Dashboard() {
       createdAt: new Date().toISOString()
     };
 
+    const isDemo = !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY.includes('YOUR_API_KEY') || currentUser.uid.startsWith('demo-');
+    if (isDemo) {
+      try {
+        const allOrders = JSON.parse(localStorage.getItem('demo_orders') || '[]');
+        const newOrderId = `order-${Date.now()}`;
+        const newOrder = { id: newOrderId, ...data };
+        allOrders.push(newOrder);
+        localStorage.setItem('demo_orders', JSON.stringify(allOrders));
+
+        triggerToast(`Errand ${newOrderId} booked successfully!`, 'success');
+        addSystemAlert(`Rider allocation underway for your new order ${newOrderId}.`);
+
+        setCategory('');
+        setPickup('');
+        setDropoff('');
+        setDescription('');
+        setUrgency('Standard');
+        setSelectedFiles([]);
+        setCurrentStep(1);
+        setActiveTab('tracking');
+        fetchUserOrders();
+      } catch (error) {
+        console.error("Error booking errand:", error);
+        triggerToast("Error processing your errand. Please try again.", "danger");
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     try {
       // Save directly to Firestore
       const docRef = await addDoc(collection(db, "orders"), data);
       const newOrderId = docRef.id;
 
-      // Submit via FormSubmit email
-      const formData = new FormData();
-      formData.append('_subject', `New Errand Booked: ${newOrderId} [${urgency}]`);
-      formData.append('Order ID', newOrderId);
-      formData.append('Category', category);
-      formData.append('Urgency Status', urgency);
-      formData.append('Pickup Address', pickup);
-      formData.append('Dropoff Address', dropoff);
-      formData.append('Detailed Description', description);
-      formData.append('Client Name', currentUser.displayName || "Customer");
-      formData.append('Client Email', currentUser.email);
-      formData.append('_captcha', 'false');
-
-      selectedFiles.forEach((file, index) => {
-        formData.append(`file_${index}`, file);
-      });
-
-      // Fire email notification in background
-      fetch('https://formsubmit.co/ajax/support@runmyerrand.com', {
+      // Submit via Backend Email API
+      fetch('/api/send-email', {
         method: 'POST',
-        body: formData
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: [currentUser.email, 'support@runmyerrand.com'],
+          subject: `New Errand Booked: ${newOrderId} [${urgency}]`,
+          html: `
+            <h2>New Errand Booked!</h2>
+            <p><b>Order ID:</b> ${newOrderId}</p>
+            <p><b>Category:</b> ${category}</p>
+            <p><b>Pickup:</b> ${pickup}</p>
+            <p><b>Dropoff:</b> ${dropoff}</p>
+            <p><b>Urgency:</b> ${urgency}</p>
+            <p><b>Client:</b> ${currentUser.displayName || "Customer"} (${currentUser.email})</p>
+            <hr />
+            <p><b>Instructions:</b><br/>${description.replace(/\\n/g, '<br/>')}</p>
+          `
+        })
       }).catch(err => console.warn("Email alert failed but order saved.", err));
 
       triggerToast(`Errand ${newOrderId} booked successfully!`, 'success');
@@ -244,21 +317,40 @@ export default function Dashboard() {
     }
   };
 
-  const [loading, setLoading] = useState(false);
+  const handleMarkDelivered = async (orderId) => {
+    setLoading(true);
+    try {
+      const isDemo = !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY.includes('YOUR_API_KEY') || currentUser?.uid.startsWith('demo-');
+      if (isDemo) {
+        const allOrders = JSON.parse(localStorage.getItem('demo_orders') || '[]');
+        const updated = allOrders.map(o => o.id === orderId ? { ...o, status: 'Completed' } : o);
+        localStorage.setItem('demo_orders', JSON.stringify(updated));
+      } else {
+        await updateDoc(doc(db, 'orders', orderId), { status: 'Completed' });
+      }
+      triggerToast('Errand marked as completed. Thank you!', 'success');
+      fetchUserOrders();
+    } catch (error) {
+      console.error("Error marking delivered:", error);
+      triggerToast('Failed to mark delivered. Please try again.', 'danger');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Status mapping functions
   const getStatusStepIndex = (status) => {
     if (status === 'Pending Assignment') return 0;
-    if (status === 'Assigned') return 1;
-    if (status === 'In Progress') return 2;
+    if (status === 'Order Ready') return 1;
+    if (status === 'Out for Delivery') return 2;
     if (status === 'Completed') return 3;
     return 0;
   };
 
   const getStatusBadgeClass = (status) => {
     if (status === 'Pending Assignment') return 'badge-pending';
-    if (status === 'Assigned') return 'badge-assigned';
-    if (status === 'In Progress') return 'badge-progress';
+    if (status === 'Order Ready') return 'badge-assigned';
+    if (status === 'Out for Delivery') return 'badge-progress';
     if (status === 'Completed') return 'badge-completed';
     return 'badge-pending';
   };
@@ -317,6 +409,16 @@ export default function Dashboard() {
             <span>Book an Errand</span>
           </div>
 
+          <div 
+            onClick={() => setActiveTab('history')} 
+            className={`db-menu-item ${activeTab === 'history' ? 'active' : ''}`}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M12 8v4l3 3M22 12A10 10 0 1 1 12 2a10 10 0 0 1 10 10z"></path>
+            </svg>
+            <span>Order History</span>
+          </div>
+
           {/* Notifications bell widget */}
           <div className="noti-bell-wrapper" style={{ marginTop: 'auto', borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
             <div 
@@ -369,13 +471,14 @@ export default function Dashboard() {
         <main className="db-main-content">
           <div className="db-header-content">
             <h1 className="db-title-text">
-              {activeTab === 'tracking' ? 'Active Errands & Tracking' : 'Book a New Errand'}
+              {activeTab === 'tracking' && 'Active Errands & Tracking'}
+              {activeTab === 'book' && 'Book a New Errand'}
+              {activeTab === 'history' && 'Completed Errands & Invoices'}
             </h1>
             <p className="db-subtitle-text">
-              {activeTab === 'tracking' 
-                ? 'Track the live delivery progress and courier state in real time.' 
-                : 'Fill out our custom logistics form to get dispatched in real time.'
-              }
+              {activeTab === 'tracking' && 'Track the live delivery progress and courier state in real time.'}
+              {activeTab === 'book' && 'Fill out our custom logistics form to get dispatched in real time.'}
+              {activeTab === 'history' && 'View your past errands and download professional invoices.'}
             </p>
           </div>
 
@@ -388,18 +491,18 @@ export default function Dashboard() {
                     <div className="splash-pulse" style={{ margin: '0 auto 1.5rem', width: '40px', height: '40px' }}></div>
                     <p style={{ color: 'var(--text-muted)' }}>Loading active errands...</p>
                   </div>
-                ) : orders.length === 0 ? (
+                ) : orders.filter(o => o.status !== 'Completed').length === 0 ? (
                   <div className="empty-state">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                       <line x1="9" y1="3" x2="9" y2="21"></line>
                       <line x1="15" y1="3" x2="15" y2="21"></line>
                     </svg>
-                    <h3>No Errands Booked Yet</h3>
+                    <h3>No Active Errands</h3>
                     <p>Create your very first logistics errand request using the Book an Errand tab.</p>
                   </div>
                 ) : (
-                  orders.map(order => {
+                  orders.filter(o => o.status !== 'Completed').map(order => {
                     const stepIndex = getStatusStepIndex(order.status);
                     return (
                       <div className="card order-card" id={`card-${order.id}`} key={order.id}>
@@ -428,11 +531,11 @@ export default function Dashboard() {
                             </div>
                             <div className={`timeline-h-step ${stepIndex >= 1 ? 'completed' : ''} ${stepIndex === 1 ? 'active' : ''}`}>
                               <div className="timeline-h-dot"></div>
-                              <span className="timeline-h-label">Assigned</span>
+                              <span className="timeline-h-label">Order Ready</span>
                             </div>
                             <div className={`timeline-h-step ${stepIndex >= 2 ? 'completed' : ''} ${stepIndex === 2 ? 'active' : ''}`}>
                               <div className="timeline-h-dot"></div>
-                              <span className="timeline-h-label">In Transit</span>
+                              <span className="timeline-h-label">Out for Delivery</span>
                             </div>
                             <div className={`timeline-h-step ${stepIndex >= 3 ? 'completed' : ''} ${stepIndex === 3 ? 'active' : ''}`}>
                               <div className="timeline-h-dot"></div>
@@ -445,13 +548,60 @@ export default function Dashboard() {
                             <div className="map-grid-overlay"></div>
                             <div className="map-route-line"></div>
                             <div className="map-pin"></div> {/* pickup */}
-                            {order.status === 'In Progress' && <div className="map-pin rider"></div>}
+                            {order.status === 'Out for Delivery' && <div className="map-pin rider"></div>}
                             <div className="map-pin dropoff"></div> {/* dropoff */}
                             
-                            <div className="map-label">
-                              {order.riderName ? `Courier: ${order.riderName} (${order.riderPhone || ''})` : 'Assigning Courier...'}
+                            <div className="map-label" style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                              <span style={{ fontWeight: 600 }}>{order.riderName ? `Courier: ${order.riderName}` : 'Assigning Courier...'}</span>
+                              {order.riderPhone && <span style={{ fontSize: '0.75rem', opacity: 0.9 }}>📞 {order.riderPhone}</span>}
+                              {order.riderVehicleType && (
+                                <span style={{ fontSize: '0.75rem', opacity: 0.9 }}>
+                                  🚗 {order.riderColor} {order.riderVehicleType} &mdash; {order.riderPlate}
+                                </span>
+                              )}
                             </div>
                           </div>
+                          
+                          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem' }}>
+                            <button 
+                              className="btn btn-secondary btn-sm" 
+                              style={{ flex: 1, justifyContent: 'center' }}
+                              onClick={() => loadChat(order.id)}
+                            >
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                              {chatOrderId === order.id ? 'Close Chat' : 'Chat Support'}
+                            </button>
+                            
+                            {order.status === 'Out for Delivery' && (
+                              <button 
+                                className="btn btn-primary btn-sm" 
+                                style={{ flex: 1, justifyContent: 'center' }}
+                                onClick={() => handleMarkDelivered(order.id)}
+                              >
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Mark as Delivered
+                              </button>
+                            )}
+                          </div>
+                          
+                          {chatOrderId === order.id && (
+                            <div style={{ marginTop: '1rem', background: 'var(--bg-light)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+                              <div style={{ padding: '0.75rem 1rem', background: 'var(--bg-main)', borderBottom: '1px solid var(--border-color)', fontWeight: 600, fontSize: '0.85rem' }}>Live Support Chat</div>
+                              <div style={{ height: '220px', overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                {messages.length === 0 ? <p style={{ color: 'var(--text-light)', fontSize: '0.8rem', textAlign: 'center' }}>Start the conversation...</p> : null}
+                                {messages.map(m => (
+                                  <div key={m.id} style={{ alignSelf: m.senderType === 'client' ? 'flex-end' : 'flex-start', background: m.senderType === 'client' ? 'var(--primary)' : 'var(--bg-card)', color: m.senderType === 'client' ? '#fff' : 'var(--text-main)', padding: '0.5rem 0.85rem', borderRadius: 'var(--radius-sm)', fontSize: '0.8rem', maxWidth: '85%', border: m.senderType === 'client' ? 'none' : '1px solid var(--border-color)' }}>
+                                    <div style={{ fontSize: '0.65rem', opacity: 0.8, marginBottom: '0.15rem' }}>{m.senderName}</div>
+                                    {m.text}
+                                  </div>
+                                ))}
+                              </div>
+                              <div style={{ display: 'flex', borderTop: '1px solid var(--border-color)', background: 'var(--bg-card)' }}>
+                                <input className="form-input" style={{ border: 'none', borderRadius: 0 }} placeholder="Type message..." value={newMessage} onChange={e => setNewMessage(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSendMessage()} />
+                                <button className="btn btn-primary" style={{ borderRadius: 0 }} onClick={handleSendMessage}>Send</button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
@@ -689,6 +839,58 @@ export default function Dashboard() {
                     </strong>
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tab 3: History & Invoices */}
+          {activeTab === 'history' && (
+            <div id="history-section" style={{ display: 'block' }}>
+              <div className="orders-list">
+                {orders.filter(o => o.status === 'Completed').length === 0 ? (
+                  <div className="empty-state">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line>
+                    </svg>
+                    <h3>No Completed Errands</h3>
+                    <p>Once your active errands are delivered, they will appear here as invoices.</p>
+                  </div>
+                ) : (
+                  orders.filter(o => o.status === 'Completed').map(order => (
+                    <div className="card order-card" key={order.id}>
+                      <div className="order-card-header">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <h3 style={{ fontSize: '1.1rem', color: 'var(--secondary)' }}>{order.id}</h3>
+                          <span className="badge badge-completed">Completed</span>
+                        </div>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                          {new Date(order.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      <p style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--primary)' }}>{order.category}</p>
+                      
+                      <div className="order-meta-info" style={{ marginBottom: '1.5rem', background: 'var(--bg-light)', padding: '1rem', borderRadius: 'var(--radius-sm)' }}>
+                        <div className="order-meta-item">Pickup: <strong>{order.pickupLocation}</strong></div>
+                        <div className="order-meta-item">Dropoff: <strong>{order.dropoffLocation}</strong></div>
+                        <div className="order-meta-item">Courier: <strong>{order.riderName || '—'}</strong></div>
+                      </div>
+
+                      <button 
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => {
+                          // Simple window print approach for invoice
+                          document.title = `Invoice_${order.id}`;
+                          window.print();
+                          setTimeout(() => document.title = 'Run My Errand', 1000);
+                        }}
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Download Invoice
+                      </button>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           )}

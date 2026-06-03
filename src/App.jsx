@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -18,43 +18,52 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import BookNow from './pages/BookNow';
 
+const AppContent = () => {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith('/admin');
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      {!isAdmin && <Header />}
+      <main style={{ flex: 1 }}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/book-now" element={<BookNow />} />
+          
+          {/* Protected Client Dashboard */}
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
+
+          {/* Protected Admin CMS Dashboard */}
+          <Route path="/admin" element={
+            <ProtectedRoute adminOnly={true}>
+              <Admin />
+            </ProtectedRoute>
+          } />
+
+          {/* Legal Pages */}
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+        </Routes>
+      </main>
+      {!isAdmin && <Footer />}
+    </div>
+  );
+};
+
 export default function App() {
   return (
     <AuthProvider>
       <Router>
         <Splash />
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-          <Header />
-          <main style={{ flex: 1 }}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/book-now" element={<BookNow />} />
-              
-              {/* Protected Client Dashboard */}
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-
-              {/* Protected Admin CMS Dashboard */}
-              <Route path="/admin" element={
-                <ProtectedRoute adminOnly={true}>
-                  <Admin />
-                </ProtectedRoute>
-              } />
-
-              {/* Legal Pages */}
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
+        <AppContent />
       </Router>
     </AuthProvider>
   );

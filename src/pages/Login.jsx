@@ -7,15 +7,18 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, currentUser } = useAuth();
+  const { login, currentUser, userData } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already logged in
   useEffect(() => {
-    if (currentUser) {
-      navigate('/dashboard');
+    if (currentUser && userData) {
+      if (userData.role === 'admin') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
     }
-  }, [currentUser, navigate]);
+  }, [currentUser, userData, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,14 +26,12 @@ export default function Login() {
       setError('Please fill in all fields.');
       return;
     }
-
     try {
       setError('');
       setLoading(true);
       await login(email, password);
-      navigate('/dashboard');
     } catch (err) {
-      console.error("Login failed:", err);
+      console.error('Login failed:', err);
       setError('Invalid email or password.');
     } finally {
       setLoading(false);
@@ -51,48 +52,44 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label className="form-label" htmlFor="login-email">Email Address</label>
-            <input 
-              className="form-input" 
-              type="email" 
-              id="login-email" 
-              required 
+            <input
+              className="form-input"
+              type="email"
+              id="login-email"
+              required
               placeholder="abena@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
+
           <div className="form-group">
             <label className="form-label" htmlFor="login-password">Password</label>
-            <input 
-              className="form-input" 
-              type="password" 
-              id="login-password" 
-              required 
+            <input
+              className="form-input"
+              type="password"
+              id="login-password"
+              required
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          
-          {error && (
-            <p className="error-msg" style={{ display: 'block', color: 'var(--danger, #ef4444)', fontSize: '0.85rem', marginTop: '0.5rem', marginBottom: '1rem' }}>
-              {error}
-            </p>
-          )}
 
-          <button 
-            type="submit" 
-            className="btn btn-primary" 
+          {error && <p className="error-msg">{error}</p>}
+
+          <button
+            type="submit"
+            className="btn btn-primary auth-submit-btn"
             id="login-btn"
             disabled={loading}
-            style={{ width: '100%', marginTop: '1rem', padding: '1rem' }}
           >
-            {loading ? 'Logging In...' : 'Log In'}
+            {loading ? 'Logging In…' : 'Log In'}
           </button>
         </form>
 
-        <div className="auth-footer" style={{ textAlign: 'center', marginTop: '1.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-          Don't have an account? <Link to="/signup" style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none' }}>Sign Up</Link>
+        <div className="auth-footer">
+          Don't have an account? <Link to="/signup">Sign Up</Link>
         </div>
       </div>
     </div>

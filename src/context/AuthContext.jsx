@@ -19,11 +19,23 @@ export function AuthProvider({ children }) {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const isDemoMode = !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY.includes('YOUR_API_KEY');
+
   useEffect(() => {
+    if (isDemoMode) {
+      const savedUser = localStorage.getItem('demo_user');
+      const savedData = localStorage.getItem('demo_user_data');
+      if (savedUser && savedData) {
+        setCurrentUser(JSON.parse(savedUser));
+        setUserData(JSON.parse(savedData));
+      }
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setCurrentUser(user);
-        // Fetch custom user profile (phone, address, role) from Firestore
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid));
           if (userDoc.exists()) {
@@ -46,14 +58,36 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = (email, password) => {
+    if (isDemoMode || email.includes('demo.com')) {
+      const role = email.toLowerCase() === 'admin@demo.com' ? 'admin' : 'user';
+      const name = role === 'admin' ? 'Demo Admin' : 'Demo User';
+      const user = { uid: `demo-${role}-uid`, email, displayName: name };
+      const data = { role, name, email, phone: "+233 24 000 0000", address: "Demo Street, Accra" };
+
+      setCurrentUser(user);
+      setUserData(data);
+      localStorage.setItem('demo_user', JSON.stringify(user));
+      localStorage.setItem('demo_user_data', JSON.stringify(data));
+      return Promise.resolve(user);
+    }
     return signInWithEmailAndPassword(auth, email, password);
   };
 
   const signup = async (email, password, additionalData) => {
+    if (isDemoMode) {
+      const user = { uid: `demo-user-${Date.now()}`, email, displayName: additionalData.name || "Demo User" };
+      const data = { role: "user", email, createdAt: new Date().toISOString(), ...additionalData };
+
+      setCurrentUser(user);
+      setUserData(data);
+      localStorage.setItem('demo_user', JSON.stringify(user));
+      localStorage.setItem('demo_user_data', JSON.stringify(data));
+      return Promise.resolve(user);
+    }
+
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     
-    // Save additional fields in Firestore
     await setDoc(doc(db, "users", user.uid), {
       email,
       role: "user",
@@ -65,6 +99,13 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    if (isDemoMode || (currentUser && currentUser.uid.startsWith('demo-'))) {
+      setCurrentUser(null);
+      setUserData(null);
+      localStorage.removeItem('demo_user');
+      localStorage.removeItem('demo_user_data');
+      return Promise.resolve();
+    }
     return signOut(auth);
   };
 

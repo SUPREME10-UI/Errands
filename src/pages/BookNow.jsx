@@ -13,13 +13,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { getServices } from '../lib/dbHelper';
+
 export default function BookNow() {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [category, setCategory] = useState('Parcel Pickup & Delivery');
+  const [category, setCategory] = useState('');
   const [pickup, setPickup] = useState('');
   const [dropoff, setDropoff] = useState('');
   const [description, setDescription] = useState('');
@@ -27,19 +29,36 @@ export default function BookNow() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [modalConfig, setModalConfig] = useState(null);
+
+  const showAlert = (message, title = "Notice", type = "warning") => {
+    setModalConfig({ message, title, type });
+  };
 
   const fileInputRef = useRef(null);
   const categoryWrapperRef = useRef(null);
 
-  const categories = [
-    { value: "Personal & Corporate Errands", base: 50, desc: "Filing, administrative support, runs" },
-    { value: "Parcel Pickup & Delivery", base: 50, desc: "Fast & secure parcel courier service" },
-    { value: "Travel & Support", base: 80, desc: "Airport protocols, meet-and-greets" },
-    { value: "Shopping & Vendor Services", base: 60, desc: "Grocery shopping, vendor payouts" },
-    { value: "House Management", base: 120, desc: "Artisan oversight, domestic supervision" },
-    { value: "Documentation & Compliance Assistance", base: 150, desc: "Notary, corporate company filings" },
-    { value: "Site Inspection Updates", base: 250, desc: "Diaspora developers construction audits" }
-  ];
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const list = await getServices();
+        const mapped = list.map(s => ({
+          value: s.title,
+          desc: s.desc,
+          base: s.basePrice
+        }));
+        setCategories(mapped);
+        if (mapped.length > 0) {
+          setCategory(mapped[0].value);
+        }
+      } catch (err) {
+        console.error("Error fetching categories in BookNow:", err);
+      }
+    };
+    loadCategories();
+  }, []);
 
   // Close category select on outside clicks
   useEffect(() => {
@@ -54,15 +73,15 @@ export default function BookNow() {
 
   const handleNextStep = () => {
     if (currentStep === 1 && !category) {
-      alert('Please select a service category.');
+      showAlert('Please select a service category.');
       return;
     }
     if (currentStep === 2 && (!pickup.trim() || !dropoff.trim())) {
-      alert('Please provide pickup and dropoff locations.');
+      showAlert('Please provide pickup and dropoff locations.');
       return;
     }
     if (currentStep === 3 && !description.trim()) {
-      alert('Please enter errand details.');
+      showAlert('Please enter errand details.');
       return;
     }
     if (currentStep < 4) {
@@ -89,8 +108,11 @@ export default function BookNow() {
     e.preventDefault();
     if (!currentUser) {
       // Redirect to login but maybe pass state to return here?
-      alert("Please log in to submit your errand.");
-      navigate('/login', { state: { from: location.pathname } });
+      showAlert("Please log in to submit your errand.", "Authentication Required");
+      // Give them a moment to see the alert before navigating, or navigate after they click OK
+      // For now, let's just use the modal. But wait, if we navigate immediately, they won't see it.
+      // So we'll skip immediate navigation and let them click OK or manually go to login.
+      // Actually, let's just let them read it.
       return;
     }
 
@@ -109,13 +131,32 @@ export default function BookNow() {
       createdAt: new Date().toISOString()
     };
 
+    const isDemo = !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY.includes('YOUR_API_KEY') || currentUser.uid.startsWith('demo-');
+    if (isDemo) {
+      try {
+        const allOrders = JSON.parse(localStorage.getItem('demo_orders') || '[]');
+        const newOrderId = `order-${Date.now()}`;
+        const newOrder = { id: newOrderId, ...data };
+        allOrders.push(newOrder);
+        localStorage.setItem('demo_orders', JSON.stringify(allOrders));
+        showAlert(`Errand ${newOrderId} booked successfully!`, "Success", "success");
+        setTimeout(() => navigate('/dashboard'), 2000);
+      } catch (error) {
+        console.error("Error booking errand in demo mode:", error);
+        showAlert("Error processing your errand. Please try again.", "Error", "danger");
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     try {
       const docRef = await addDoc(collection(db, "orders"), data);
-      alert(`Errand ${docRef.id} booked successfully!`);
-      navigate('/dashboard'); // Go to dashboard to track it
+      showAlert(`Errand ${docRef.id} booked successfully!`, "Success", "success");
+      setTimeout(() => navigate('/dashboard'), 2000); // Go to dashboard to track it
     } catch (error) {
       console.error("Error booking errand:", error);
-      alert("Error processing your errand. Please try again.");
+      showAlert("Error processing your errand. Please try again.", "Error", "danger");
     } finally {
       setLoading(false);
     }
@@ -287,6 +328,38 @@ export default function BookNow() {
           </form>
         </div>
       </div>
+
+      {/* Nice UI Modal for Alerts */}
+      {modalConfig && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)' }} onClick={() => setModalConfig(null)}>
+          <div style={{ background: 'var(--bg)', padding: '2rem', borderRadius: '16px', maxWidth: '400px', width: '90%', textAlign: 'center', boxShadow: '0 10px 40px rgba(0,0,0,0.2)', border: '1px solid var(--border)' }} onClick={e => e.stopPropagation()}>
+            <div style={{ marginBottom: '1rem', color: modalConfig.type === 'danger' ? '#ef4444' : modalConfig.type === 'success' ? '#10b981' : '#f59e0b' }}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto' }}>
+                {modalConfig.type === 'danger' && <circle cx="12" cy="12" r="10"></circle>}
+                {modalConfig.type === 'danger' && <line x1="12" y1="8" x2="12" y2="12"></line>}
+                {modalConfig.type === 'danger' && <line x1="12" y1="16" x2="12.01" y2="16"></line>}
+                
+                {modalConfig.type === 'warning' && <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>}
+                {modalConfig.type === 'warning' && <line x1="12" y1="9" x2="12" y2="13"></line>}
+                {modalConfig.type === 'warning' && <line x1="12" y1="17" x2="12.01" y2="17"></line>}
+
+                {modalConfig.type === 'success' && <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>}
+                {modalConfig.type === 'success' && <polyline points="22 4 12 14.01 9 11.01"></polyline>}
+              </svg>
+            </div>
+            <h3 style={{ marginBottom: '0.75rem', fontSize: '1.25rem' }}>{modalConfig.title}</h3>
+            <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.5' }}>{modalConfig.message}</p>
+            <button className="btn btn-primary" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px' }} onClick={() => {
+              setModalConfig(null);
+              if (modalConfig.message.includes('log in')) {
+                navigate('/login', { state: { from: location.pathname } });
+              }
+            }}>
+              Okay
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
