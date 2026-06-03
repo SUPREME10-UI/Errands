@@ -1,29 +1,39 @@
 // Client Dashboard Booking Flow JS
+import { auth, db, onAuthStateChanged, collection, addDoc, getDocs, query, where, orderBy } from "./firebaseConfig.js";
 
 let currentStep = 1;
 const totalSteps = 4;
 let ordersHistory = [];
 let selectedFiles = [];
+let currentUser = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-  setupSidebarNavigation();
-  setupCustomCategoryDropdown();
-  setupCategoryPicker();
-  setupWizardStepper();
-  setupDragAndDrop();
-  setupNotificationCenter();
-  
-  // Initial cost calculation
-  calculateCosts();
-  
-  // Read any pre-selected service from URL query params
-  checkPreselectedService();
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      currentUser = user;
+      
+      setupSidebarNavigation();
+      setupCustomCategoryDropdown();
+      setupCategoryPicker();
+      setupWizardStepper();
+      setupDragAndDrop();
+      setupNotificationCenter();
+      
+      // Initial cost calculation
+      calculateCosts();
+      
+      // Read any pre-selected service from URL query params
+      checkPreselectedService();
 
-  // Load user orders
-  fetchUserOrders();
-  
-  // Set up periodic tracking update (state synchronization!)
-  setInterval(fetchUserOrders, 4000);
+      // Load user orders
+      fetchUserOrders();
+      
+      // Set up periodic tracking update (state synchronization!)
+      setInterval(fetchUserOrders, 4000);
+    } else {
+      window.location.href = "/login.html";
+    }
+  });
 });
 
 // 1. Navigation tab toggling
@@ -373,24 +383,19 @@ function submitErrandBooking() {
     pickupLocation,
     dropoffLocation,
     urgency,
-    clientName: "Abena Osei",
-    clientEmail: "abena@example.com",
-    clientPhone: "+233 24 412 3456"
+    clientName: currentUser.displayName || "Customer",
+    clientEmail: currentUser.email,
+    userId: currentUser.uid,
+    status: "Pending Assignment",
+    createdAt: new Date().toISOString()
   };
 
   showToast("Submitting your errand booking...", "info");
 
-  // Submit via local API first for real-time tracking dashboard
-  fetch('/api/orders', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  })
-  .then(res => {
-    if (!res.ok) throw new Error("Booking submission failed.");
-    return res.json();
-  })
-  .then(newOrder => {
+  addDoc(collection(db, "orders"), data)
+  .then(docRef => {
+    const newOrder = { id: docRef.id, ...data };
+    
     // FormSubmit integration to send to support@runmyerrand.com
     const formData = new FormData();
     formData.append('_subject', `New Errand Booked: ${newOrder.id} [${urgency}]`);
@@ -461,13 +466,17 @@ function submitErrandBooking() {
 }
 
 // 7. Load and render Active user orders
-function fetchUserOrders() {
+async function fetchUserOrders() {
   const container = document.getElementById('orders-list-container');
-  if (!container) return;
+  if (!container || !currentUser) return;
 
-  fetch('/api/orders')
-  .then(res => res.json())
-  .then(orders => {
+  try {
+    const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid));
+    const querySnapshot = await getDocs(q);
+    
+    let orders = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
     // If no orders
     if (orders.length === 0) {
       container.innerHTML = `
@@ -556,8 +565,9 @@ function fetchUserOrders() {
         </div>
       `;
     }).join('');
-  })
-  .catch(err => console.error("Error fetching active bookings:", err));
+  } catch (err) {
+    console.error("Error fetching active bookings:", err);
+  }
 }
 
 function getStatusStepIndex(status) {

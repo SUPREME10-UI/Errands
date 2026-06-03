@@ -1,0 +1,167 @@
+.book-now-page {
+  background-color: var(--bg);
+  min-height: 100vh;
+}
+
+.quick-book-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.quick-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.quick-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.whatsapp-card {
+  background: rgba(16, 185, 129, 0.05);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.email-card {
+  background: rgba(37, 99, 235, 0.05);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.quick-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.whatsapp-icon {
+  background: #10b981;
+}
+
+.email-icon {
+  background: #1e3a8a;
+}
+
+.quick-text h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  color: var(--secondary);
+}
+
+.quick-text p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.wizard-main-card {
+  background: var(--bg-card);
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.wizard-header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.wizard-header-icon {
+  background: #1e3a8a;
+  color: white;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wizard-header-text h2 {
+  margin: 0 0 0.25rem 0;
+  color: #1e3a8a;
+  font-size: 1.5rem;
+}
+
+.wizard-header-text p {
+  margin: 0;
+  color: var(--text-light);
+  font-size: 0.95rem;
+}
+
+.wizard-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+.standalone-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+
+.stepper-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  z-index: 2;
+}
+
+.stepper-circle.active {
+  background: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+.stepper-circle.completed {
+  background: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+.stepper-line {
+  height: 2px;
+  background: var(--border);
+  flex: 1;
+  max-width: 120px;
+  margin: 0 -2px;
+  z-index: 1;
+}
+
+.stepper-line.completed {
+  background: #007bff;
+}
+
+.standalone-wizard-form .step-title {
+  color: #1e3a8a;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .quick-book-cards {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,6 +1,35 @@
 /* Global Styles and Resets */
 @import url('variables.css');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+  }
+}
+
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -28,13 +57,13 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.25;
 }
 
-[data-theme="dark"] h1, 
-[data-theme="dark"] h2, 
-[data-theme="dark"] h3, 
-[data-theme="dark"] h4, 
-[data-theme="dark"] h5, 
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
 [data-theme="dark"] h6 {
-  color: var(--bg-light);
+  color: var(--text-main);
 }
 
 a {
@@ -61,10 +90,34 @@ input, button, select, textarea {
   background: none;
 }
 
-/* Premium Scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+/* Theme Toggle Button */
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--primary);
+  transition: var(--transition-smooth);
+}
+.theme-toggle:hover {
+  background: var(--secondary);
+  color: #fff;
+}
+
+/* Ensure header items are spaced nicely */
+.header .nav-actions {
+  gap: 1rem;
+}
+
+/* Adjust hamburger position on small screens */
+@media (max-width: 768px) {
+  .header .nav-actions {
+    margin-left: auto;
+  }
 }
 
 ::-webkit-scrollbar-track {
@@ -175,7 +228,7 @@ input, button, select, textarea {
 }
 
 .btn-outline:hover {
-  background: var(--primary);
+  background: var(--secondary);
   color: #FFFFFF;
 }
 

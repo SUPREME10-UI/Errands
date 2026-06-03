@@ -422,20 +422,35 @@
 }
 
 .why-us-image {
-  border-radius: var(--radius-lg);
+  border-radius: 50%;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
   position: relative;
   background: var(--bg-card);
-  padding: 1.5rem;
+  width: 340px;
+  height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--border-color);
 }
+
+.why-us-badge {
+  background: var(--secondary) !important;
+}
+
+.why-us-image svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 
 .why-us-badge {
   position: absolute;
   bottom: 3rem;
   right: 3rem;
-  background: var(--primary);
+  background: var(--secondary);
   color: #FFFFFF;
   padding: 1.5rem;
   border-radius: var(--radius-md);

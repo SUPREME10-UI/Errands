@@ -1,3 +1,7 @@
 node_modules/
+dist/
 .DS_Store
 *.log
+
+# Environment variables — never commit real credentials
+.env

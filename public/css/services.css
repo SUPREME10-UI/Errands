@@ -57,11 +57,15 @@
 
 .service-detail-card:hover .service-icon-box {
   background: var(--secondary);
-  color: #FFFFFF;
-  transform: scale(1.1) rotate(5deg);
-  box-shadow: var(--shadow-glow);
+  color: #FFFFFF !important;
 }
 
+.service-detail-card:hover .service-icon-box svg {
+  stroke: currentColor;
+  fill: none;
+}
+
+/* Removed stray stepper CSS that belonged to BookNow page */
 .service-badge {
   background: var(--bg-light);
   color: var(--primary);
