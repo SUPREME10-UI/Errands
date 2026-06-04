@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { useAuth } from './context/AuthContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Splash from './components/Splash';
@@ -20,7 +21,19 @@ import BookNow from './pages/BookNow';
 
 const AppContent = () => {
   const location = useLocation();
+  const { currentUser, userData, logout } = useAuth();
   const isAdmin = location.pathname.startsWith('/admin');
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+
+  // Auto-logout admin users when they access public pages
+  useEffect(() => {
+    const publicRoutes = ['/', '/services', '/contact', '/book-now', '/privacy', '/terms'];
+    const isPublicRoute = publicRoutes.includes(location.pathname);
+
+    if (isPublicRoute && currentUser && userData?.role === 'admin') {
+      logout().catch(err => console.error('Auto-logout failed:', err));
+    }
+  }, [location.pathname, currentUser, userData, logout]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -53,7 +66,7 @@ const AppContent = () => {
           <Route path="/terms" element={<Terms />} />
         </Routes>
       </main>
-      {!isAdmin && <Footer />}
+      {!isAdmin && !isAuthPage && <Footer />}
     </div>
   );
 };

@@ -70,7 +70,7 @@
 .auth-form .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0rem;
 }
 
 .form-label {

@@ -112,25 +112,11 @@ export const getServices = async () => {
   }
 
   try {
-    const q = query(collection(db, "services"));
-    const querySnapshot = await getDocs(q);
-    
-    // Seed Firestore if empty
-    if (querySnapshot.empty) {
-      const added = [];
-      for (const service of defaultServices) {
-        // Strip temporary id field for Firestore auto-ids
-        const { id, ...rest } = service;
-        const docRef = await addDoc(collection(db, "services"), rest);
-        added.push({ id: docRef.id, ...rest });
-      }
-      return added;
-    }
-    
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const res = await fetch('/api/services');
+    if (!res.ok) throw new Error('Failed to fetch services');
+    return await res.json();
   } catch (error) {
-    console.error("Error fetching services from Firestore:", error);
-    // Return default list as local fallback on error
+    console.error("Error fetching services from Postgres:", error);
     return defaultServices;
   }
 };
@@ -153,15 +139,13 @@ export const saveService = async (service) => {
     return service;
   }
 
-  const { id, ...data } = service;
-  if (id) {
-    const docRef = doc(db, "services", id);
-    await updateDoc(docRef, data);
-    return { id, ...data };
-  } else {
-    const docRef = await addDoc(collection(db, "services"), data);
-    return { id: docRef.id, ...data };
-  }
+  const res = await fetch('/api/services', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(service)
+  });
+  if (!res.ok) throw new Error('Failed to save service');
+  return await res.json();
 };
 
 export const deleteService = async (id) => {
@@ -172,8 +156,10 @@ export const deleteService = async (id) => {
     return;
   }
 
-  const docRef = doc(db, "services", id);
-  await deleteDoc(docRef);
+  const res = await fetch(`/api/services/${id}`, {
+    method: 'DELETE'
+  });
+  if (!res.ok) throw new Error('Failed to delete service');
 };
 
 export const getContactMessages = async () => {
@@ -184,13 +170,11 @@ export const getContactMessages = async () => {
   }
 
   try {
-    const q = query(collection(db, "contactMessages"));
-    const querySnapshot = await getDocs(q);
-    const msgs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    msgs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    return msgs;
+    const res = await fetch('/api/contact-messages');
+    if (!res.ok) throw new Error('Failed to fetch contact messages');
+    return await res.json();
   } catch (error) {
-    console.error("Error fetching contact messages from Firestore:", error);
+    console.error("Error fetching contact messages from Postgres:", error);
     return [];
   }
 };
@@ -203,8 +187,12 @@ export const updateContactStatus = async (id, status) => {
     return;
   }
 
-  const docRef = doc(db, "contactMessages", id);
-  await updateDoc(docRef, { status });
+  const res = await fetch(`/api/contact-messages/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status })
+  });
+  if (!res.ok) throw new Error('Failed to update contact status');
 };
 
 export const deleteContactMessage = async (id) => {
@@ -215,21 +203,23 @@ export const deleteContactMessage = async (id) => {
     return;
   }
 
-  const docRef = doc(db, "contactMessages", id);
-  await deleteDoc(docRef);
+  const res = await fetch(`/api/contact-messages/${id}`, {
+    method: 'DELETE'
+  });
+  if (!res.ok) throw new Error('Failed to delete contact message');
 };
 
 /* ═══════════════════════════════════════════════════
    RIDERS
-═══════════════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════ */
 export const getRiders = async () => {
   if (isDemo) {
     return JSON.parse(localStorage.getItem('demo_riders') || '[]');
   }
   try {
-    const q = query(collection(db, "riders"));
-    const snap = await getDocs(q);
-    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const res = await fetch('/api/riders');
+    if (!res.ok) throw new Error('Failed to fetch riders');
+    return await res.json();
   } catch (error) {
     console.error("Error fetching riders:", error);
     return [];
@@ -250,14 +240,14 @@ export const saveRider = async (rider) => {
     localStorage.setItem('demo_riders', JSON.stringify(list));
     return rider;
   }
-  const { id, ...data } = rider;
-  if (id) {
-    await updateDoc(doc(db, "riders", id), data);
-    return { id, ...data };
-  } else {
-    const docRef = await addDoc(collection(db, "riders"), data);
-    return { id: docRef.id, ...data };
-  }
+
+  const res = await fetch('/api/riders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(rider)
+  });
+  if (!res.ok) throw new Error('Failed to save rider');
+  return await res.json();
 };
 
 export const deleteRider = async (id) => {
@@ -266,13 +256,17 @@ export const deleteRider = async (id) => {
     localStorage.setItem('demo_riders', JSON.stringify(list.filter(r => r.id !== id)));
     return;
   }
-  await deleteDoc(doc(db, "riders", id));
+
+  const res = await fetch(`/api/riders/${id}`, {
+    method: 'DELETE'
+  });
+  if (!res.ok) throw new Error('Failed to delete rider');
 };
 
 
 /* ═══════════════════════════════════════════════════
    CHAT MESSAGES
-═══════════════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════ */
 export const sendMessage = async (orderId, text, senderName, senderType) => {
   const payload = {
     text,
@@ -288,7 +282,12 @@ export const sendMessage = async (orderId, text, senderName, senderType) => {
     return;
   }
 
-  await addDoc(collection(db, "orders", orderId, "messages"), payload);
+  const res = await fetch(`/api/orders/${orderId}/messages`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error('Failed to send message');
 };
 
 export const getMessages = async (orderId) => {
@@ -296,11 +295,9 @@ export const getMessages = async (orderId) => {
     return JSON.parse(localStorage.getItem(`demo_chat_${orderId}`) || '[]');
   }
   try {
-    const q = query(collection(db, "orders", orderId, "messages"));
-    const snap = await getDocs(q);
-    const msgs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    msgs.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    return msgs;
+    const res = await fetch(`/api/orders/${orderId}/messages`);
+    if (!res.ok) throw new Error('Failed to fetch messages');
+    return await res.json();
   } catch (error) {
     console.error("Error fetching messages:", error);
     return [];

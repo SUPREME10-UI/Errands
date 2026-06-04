@@ -16,17 +16,17 @@ export default function Splash() {
 
   return (
     <div id="splash-screen" className="fade-out-splash">
-      <div class="splash-content">
-        <div class="splash-logo-container">
-          <img src="/logo.jpg" alt="RME Logo" class="splash-logo" />
-          <div class="splash-pulse"></div>
+      <div className="splash-content">
+        <div className="splash-logo-container">
+          <img src="/logo.jpg" alt="RME Logo" className="splash-logo" />
+          <div className="splash-pulse"></div>
         </div>
-        <h2 class="splash-title">RUN MY ERRAND</h2>
-        <p class="splash-subtitle">Errands Done Right</p>
-        <div class="splash-loader-bar">
-          <div class="splash-loader-progress"></div>
+        <h2 className="splash-title">RUN MY ERRAND</h2>
+        <p className="splash-subtitle">Errands Done Right</p>
+        <div className="splash-loader-bar">
+          <div className="splash-loader-progress"></div>
         </div>
-        <p class="splash-loading-text">Initializing Concierge Services...</p>
+        <p className="splash-loading-text">Initializing Concierge Services...</p>
       </div>
     </div>
   );

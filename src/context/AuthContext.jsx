@@ -37,14 +37,15 @@ export function AuthProvider({ children }) {
       if (user) {
         setCurrentUser(user);
         try {
-          const userDoc = await getDoc(doc(db, "users", user.uid));
-          if (userDoc.exists()) {
-            setUserData(userDoc.data());
+          const res = await fetch(`/api/users/${user.uid}`);
+          if (res.ok) {
+            const data = await res.json();
+            setUserData(data);
           } else {
             setUserData({ role: "user" });
           }
         } catch (error) {
-          console.error("Error fetching user data from Firestore:", error);
+          console.error("Error fetching user data from Postgres:", error);
           setUserData({ role: "user" });
         }
       } else {
@@ -88,11 +89,16 @@ export function AuthProvider({ children }) {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     
-    await setDoc(doc(db, "users", user.uid), {
-      email,
-      role: "user",
-      createdAt: new Date().toISOString(),
-      ...additionalData
+    await fetch('/api/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uid: user.uid,
+        email,
+        role: "user",
+        createdAt: new Date().toISOString(),
+        ...additionalData
+      })
     });
     
     return user;

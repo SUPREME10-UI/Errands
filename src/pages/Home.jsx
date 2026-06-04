@@ -280,7 +280,7 @@ export default function Home() {
               {/* Item 2 */}
               <div className="why-us-item">
                 <div className="why-us-check">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                 </div>
@@ -293,7 +293,7 @@ export default function Home() {
               {/* Item 3 */}
               <div className="why-us-item">
                 <div className="why-us-check">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                 </div>

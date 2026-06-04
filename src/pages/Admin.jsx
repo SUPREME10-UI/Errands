@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { collection, getDocs, doc, updateDoc, query } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
 import { getServices, saveService, deleteService, getContactMessages, updateContactStatus, deleteContactMessage, getMessages, sendMessage } from '../lib/dbHelper';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -140,12 +138,14 @@ function OrdersTab({ triggerToast }) {
       return;
     }
     try {
-      const snap = await getDocs(query(collection(db, 'orders')));
-      const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const res = await fetch('/api/orders');
+      if (!res.ok) throw new Error('Failed to fetch orders');
+      const list = await res.json();
       list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setOrders(list);
     } catch (err) {
-      console.error(err);
+      console.error('Error fetching orders:', err);
+      setOrders([]);
     } finally {
       setLoading(false);
     }
@@ -199,40 +199,64 @@ function OrdersTab({ triggerToast }) {
         );
         localStorage.setItem('demo_orders', JSON.stringify(updated));
       } else {
-        await updateDoc(doc(db, 'orders', selectedOrder.id), {
-          status: modalStatus,
-          ...riderData,
+        // Use appropriate endpoint based on status
+        let endpoint = `/api/orders/${selectedOrder.id}`;
+        let method = 'PUT';
+        let body = { status: modalStatus, ...riderData };
+
+        if (modalStatus === 'Assigned' || modalStatus === 'Out for Delivery') {
+          endpoint = `/api/orders/${selectedOrder.id}/approve`;
+          body = riderData;
+        } else if (modalStatus === 'Rejected') {
+          endpoint = `/api/orders/${selectedOrder.id}/reject`;
+          body = { rejectionReason: 'Service unavailable' };
+        }
+
+        const response = await fetch(endpoint, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
         });
+
+        if (!response.ok) throw new Error('Failed to update order');
       }
 
       if (selectedOrder.status !== modalStatus) {
-        let riderHtml = '';
-        if (riderData.riderName) {
-          riderHtml = `
-             <p><strong>Your Assigned Courier:</strong> ${riderData.riderName}</p>
-             <p><strong>Contact:</strong> ${riderData.riderPhone || 'N/A'}</p>
-             <p><strong>Vehicle:</strong> ${riderData.riderColor || ''} ${riderData.riderVehicleType || ''} &mdash; ${riderData.riderPlate || 'N/A'}</p>
-           `;
+        let emailSubject = `Update on your Errand: ${selectedOrder.id}`;
+        let emailBody = `<p>Hello ${selectedOrder.clientName},</p>`;
+
+        if (modalStatus === 'Assigned' || modalStatus === 'Out for Delivery') {
+          emailSubject = `Errand ${selectedOrder.id} Approved! 🎉`;
+          emailBody += `<p>The status of your errand has been updated to <strong>${modalStatus}</strong>.</p>`;
+          if (modalRider) {
+            emailBody += `<p><strong>Your Assigned Courier:</strong> ${modalRider}</p>`;
+            emailBody += `<p><strong>Contact:</strong> ${modalRiderPhone || 'N/A'}</p>`;
+            emailBody += `<p><strong>Vehicle:</strong> ${modalRiderColor || ''} ${modalRiderVehicle || ''} &mdash; ${modalRiderPlate || 'N/A'}</p>`;
+          }
+        } else if (modalStatus === 'Rejected') {
+          emailSubject = `Errand ${selectedOrder.id} Status Update`;
+          emailBody += `<p>Unfortunately, your errand could not be fulfilled at this time. Please contact support for more information.</p>`;
+        } else {
+          emailBody += `<p>The status of your errand has been updated to <strong>${modalStatus}</strong>.</p>`;
         }
+        emailBody += `<p>Thank you for using Run My Errand.</p>`;
 
         fetch('/api/send-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             to: selectedOrder.clientEmail,
-            subject: `Update on your Errand: ${selectedOrder.id}`,
-            html: `<p>Hello ${selectedOrder.clientName},</p>
-                   <p>The status of your errand has been updated to <strong>${modalStatus}</strong>.</p>
-                   ${riderHtml}
-                   <p>Thank you for using Run My Errand.</p>`
+            subject: emailSubject,
+            html: emailBody
           })
-        }).catch(err => console.warn('Email trigger failed', err));
+        }).catch(err => console.warn('Email notification failed', err));
       }
 
       triggerToast('Order updated successfully!', 'success');
       setModalOpen(false);
       fetchOrders();
     } catch (err) {
+      console.error('Save order error:', err);
       triggerToast('Failed to update order.', 'danger');
     } finally {
       setSaving(false);

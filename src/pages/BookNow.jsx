@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
 import { useAuth } from '../context/AuthContext';
 import './book-now.css';
 import './glass-card.css';
@@ -107,12 +105,7 @@ export default function BookNow() {
   const handleBookErrand = async (e) => {
     e.preventDefault();
     if (!currentUser) {
-      // Redirect to login but maybe pass state to return here?
       showAlert("Please log in to submit your errand.", "Authentication Required");
-      // Give them a moment to see the alert before navigating, or navigate after they click OK
-      // For now, let's just use the modal. But wait, if we navigate immediately, they won't see it.
-      // So we'll skip immediate navigation and let them click OK or manually go to login.
-      // Actually, let's just let them read it.
       return;
     }
 
@@ -151,9 +144,17 @@ export default function BookNow() {
     }
 
     try {
-      const docRef = await addDoc(collection(db, "orders"), data);
-      showAlert(`Errand ${docRef.id} booked successfully!`, "Success", "success");
-      setTimeout(() => navigate('/dashboard'), 2000); // Go to dashboard to track it
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) throw new Error('Failed to create order');
+      
+      const order = await response.json();
+      showAlert(`Errand ${order.id} booked successfully!`, "Success", "success");
+      setTimeout(() => navigate('/dashboard'), 2000);
     } catch (error) {
       console.error("Error booking errand:", error);
       showAlert("Error processing your errand. Please try again.", "Error", "danger");
