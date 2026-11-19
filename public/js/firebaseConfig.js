@@ -12,19 +12,27 @@ const env = (typeof window !== 'undefined' && window.__ENV__)
   ? window.__ENV__
   : (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : {});
 
+const rawApiKey = env.VITE_FIREBASE_API_KEY;
+const isDemo = !rawApiKey || rawApiKey.includes('YOUR_API_KEY');
+
 const firebaseConfig = {
-  apiKey:            env.VITE_FIREBASE_API_KEY,
-  authDomain:        env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId:         env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket:     env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId:             env.VITE_FIREBASE_APP_ID,
+  apiKey:            isDemo ? 'demo-api-key-safe-placeholder' : rawApiKey,
+  authDomain:        env.VITE_FIREBASE_AUTH_DOMAIN || 'demo-project.firebaseapp.com',
+  projectId:         env.VITE_FIREBASE_PROJECT_ID || 'demo-project',
+  storageBucket:     env.VITE_FIREBASE_STORAGE_BUCKET || 'demo-project.appspot.com',
+  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID || '123456789',
+  appId:             env.VITE_FIREBASE_APP_ID || '1:123456789:web:abcdef',
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+// Initialize Firebase safely
+let app, auth, db;
+try {
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+} catch (e) {
+  console.warn("Firebase client initialization warning:", e.message);
+}
 
 export { 
   auth, 
