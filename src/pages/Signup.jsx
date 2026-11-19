@@ -51,7 +51,7 @@ export default function Signup() {
       <div className="auth-card">
         <div className="auth-header">
           <Link to="/">
-            <img src="/logo.jpg" alt="RME Logo" />
+            <img src="/logo.png" alt="RME Logo" />
           </Link>
           <h1>Create Account</h1>
           <p>Join Run My Errand for premium logistics</p>

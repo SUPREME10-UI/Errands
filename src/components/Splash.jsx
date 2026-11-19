@@ -18,7 +18,7 @@ export default function Splash() {
     <div id="splash-screen" className="fade-out-splash">
       <div className="splash-content">
         <div className="splash-logo-container">
-          <img src="/logo.jpg" alt="RME Logo" className="splash-logo" />
+          <img src="/logo.png" alt="RME Logo" className="splash-logo" />
           <div className="splash-pulse"></div>
         </div>
         <h2 className="splash-title">RUN MY ERRAND</h2>

@@ -43,7 +43,7 @@ export default function Login() {
       <div className="auth-card">
         <div className="auth-header">
           <Link to="/">
-            <img src="/logo.jpg" alt="RME Logo" />
+            <img src="/logo.png" alt="RME Logo" />
           </Link>
           <h1>Welcome Back</h1>
           <p>Log in to your dashboard</p>

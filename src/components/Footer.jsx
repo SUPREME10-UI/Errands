@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="container footer-grid">
         <div className="footer-col">
           <Link to="/" className="logo">
-            <img className="logo-image" src="/logo.jpg" alt="RME Logo" style={{ borderColor: 'var(--accent)' }} />
+            <img className="logo-image" src="/logo.png" alt="RME Logo" style={{ borderColor: 'var(--accent)' }} />
             <div className="logo-text">
               <span style={{ color: '#FFFFFF' }}>RUN MY ERRAND</span>
               <span style={{ color: 'var(--accent)' }}>Errands Done Right</span>

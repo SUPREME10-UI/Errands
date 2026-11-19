@@ -22,7 +22,7 @@ export default function Header() {
       <header className="header">
         <div className="container header-container">
           <Link to="/" className="logo">
-            <img className="logo-image" src="/logo.jpg" alt="RME Logo" />
+            <img className="logo-image" src="/logo.png" alt="RME Logo" />
             <div className="logo-text">
               <span>RUN MY ERRAND</span>
               <span>Errands Done Right</span>
