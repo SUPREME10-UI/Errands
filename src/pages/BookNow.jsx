@@ -253,7 +253,10 @@ export default function BookNow() {
                     <SelectContent>
                       {categories.map(cat => (
                         <SelectItem key={cat.value} value={cat.value}>
-                          <div className="font-semibold text-[var(--text)]">{cat.value}</div>
+                          <div className="font-semibold text-[var(--text)] flex items-center justify-between gap-4">
+                            <span>{cat.value}</span>
+                            {cat.base && <span className="text-xs text-blue-600 font-bold">From GHS {cat.base}</span>}
+                          </div>
                           <div className="text-xs text-[var(--text-light)]">{cat.desc}</div>
                         </SelectItem>
                       ))}
@@ -267,12 +270,28 @@ export default function BookNow() {
               <div className="wizard-step-content">
                 <h3 className="step-title">Step 2: Provide Location Details</h3>
                 <div className="form-group">
-                  <label className="form-label">Pickup Address</label>
-                  <input className="form-input" type="text" value={pickup} onChange={(e) => setPickup(e.target.value)} placeholder="E.g. East Legon" required />
+                  <label className="form-label" htmlFor="book-pickup-location">📍 Pickup Location *</label>
+                  <input
+                    id="book-pickup-location"
+                    className="form-input location-input-field"
+                    type="text"
+                    value={pickup}
+                    onChange={(e) => setPickup(e.target.value)}
+                    placeholder="E.g. East Legon, Accra"
+                    required
+                  />
                 </div>
-                <div className="form-group" style={{ marginTop: '1rem' }}>
-                  <label className="form-label">Dropoff Address</label>
-                  <input className="form-input" type="text" value={dropoff} onChange={(e) => setDropoff(e.target.value)} placeholder="E.g. Osu" required />
+                <div className="form-group" style={{ marginTop: '1.25rem' }}>
+                  <label className="form-label" htmlFor="book-dropoff-location">🎯 Dropoff Location *</label>
+                  <input
+                    id="book-dropoff-location"
+                    className="form-input location-input-field"
+                    type="text"
+                    value={dropoff}
+                    onChange={(e) => setDropoff(e.target.value)}
+                    placeholder="E.g. Osu, Oxford Street, Accra"
+                    required
+                  />
                 </div>
               </div>
             )}

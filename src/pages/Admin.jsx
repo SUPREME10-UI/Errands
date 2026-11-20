@@ -1,5 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { getServices, saveService, deleteService, getContactMessages, updateContactStatus, deleteContactMessage, getMessages, sendMessage } from '../lib/dbHelper';
+import { Link } from 'react-router-dom';
+import { 
+  getServices, 
+  saveService, 
+  deleteService, 
+  getContactMessages, 
+  updateContactStatus, 
+  deleteContactMessage, 
+  getMessages, 
+  sendMessage,
+  getRiders,
+  saveRider,
+  deleteRider,
+  getUsers,
+  updateUserRole,
+  getOrders,
+  updateOrder,
+  deleteOrder
+} from '../lib/dbHelper';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const isDemo =
@@ -17,6 +35,22 @@ const Icon = ({ name, size = 18 }) => {
     Wrench: (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+      </svg>
+    ),
+    Truck: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="1" y="3" width="15" height="13" rx="2" ry="2" />
+        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+        <circle cx="5.5" cy="18.5" r="2.5" />
+        <circle cx="18.5" cy="18.5" r="2.5" />
+      </svg>
+    ),
+    Users: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
       </svg>
     ),
     Mail: (
@@ -37,11 +71,6 @@ const Icon = ({ name, size = 18 }) => {
     Trash: (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-      </svg>
-    ),
-    Eye: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
       </svg>
     ),
     Check: (
@@ -74,6 +103,13 @@ const Icon = ({ name, size = 18 }) => {
         <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
       </svg>
     ),
+    ExternalLink: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+        <polyline points="15 3 21 3 21 9" />
+        <line x1="10" y1="14" x2="21" y2="3" />
+      </svg>
+    )
   };
   return icons[name] || <svg width={size} height={size} viewBox="0 0 24 24" />;
 };
@@ -98,7 +134,7 @@ function ConfirmDialog({ open, message, onConfirm, onCancel }) {
         <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '1.5rem' }}>{message}</p>
         <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
           <button className="btn btn-secondary" onClick={onCancel}>Cancel</button>
-          <button className="btn btn-danger" onClick={onConfirm}>Delete</button>
+          <button className="btn btn-danger" onClick={onConfirm}>Confirm Delete</button>
         </div>
       </div>
     </div>
@@ -110,6 +146,7 @@ function ConfirmDialog({ open, message, onConfirm, onCancel }) {
 ═══════════════════════════════════════════════════ */
 function OrdersTab({ triggerToast }) {
   const [orders, setOrders] = useState([]);
+  const [riders, setRiders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
@@ -118,6 +155,7 @@ function OrdersTab({ triggerToast }) {
   const [modalStatus, setModalStatus] = useState('');
   const [modalRider, setModalRider] = useState('');
   const [saving, setSaving] = useState(false);
+  const [confirmDeleteOrder, setConfirmDeleteOrder] = useState(null);
 
   // Chat state
   const [messages, setMessages] = useState([]);
@@ -130,22 +168,13 @@ function OrdersTab({ triggerToast }) {
   const [modalRiderColor, setModalRiderColor] = useState('');
 
   const fetchOrders = useCallback(async () => {
-    if (isDemo) {
-      const all = JSON.parse(localStorage.getItem('demo_orders') || '[]');
-      all.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      setOrders(all);
-      setLoading(false);
-      return;
-    }
     try {
-      const res = await fetch('/api/orders');
-      if (!res.ok) throw new Error('Failed to fetch orders');
-      const list = await res.json();
-      list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const list = await getOrders();
       setOrders(list);
+      const ridersList = await getRiders();
+      setRiders(ridersList);
     } catch (err) {
       console.error('Error fetching orders:', err);
-      setOrders([]);
     } finally {
       setLoading(false);
     }
@@ -170,9 +199,20 @@ function OrdersTab({ triggerToast }) {
     setMessages(msgs);
   };
 
+  const handleSelectCourierPreset = (courierName) => {
+    setModalRider(courierName);
+    const found = riders.find(r => r.name === courierName);
+    if (found) {
+      setModalRiderPhone(found.phone || '');
+      setModalRiderVehicle(found.vehicleType || 'Motorcycle');
+      setModalRiderPlate(found.plate || '');
+      setModalRiderColor(found.color || '');
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedOrder) return;
-    await sendMessage(selectedOrder.id, newMessage, 'Admin', 'admin');
+    await sendMessage(selectedOrder.id, newMessage, 'Administrator', 'admin');
     setNewMessage('');
     const msgs = await getMessages(selectedOrder.id);
     setMessages(msgs);
@@ -190,67 +230,10 @@ function OrdersTab({ triggerToast }) {
         riderColor: modalRiderColor.trim() || null,
       };
 
-      if (isDemo) {
-        const all = JSON.parse(localStorage.getItem('demo_orders') || '[]');
-        const updated = all.map(o =>
-          o.id === selectedOrder.id
-            ? { ...o, status: modalStatus, ...riderData }
-            : o
-        );
-        localStorage.setItem('demo_orders', JSON.stringify(updated));
-      } else {
-        // Use appropriate endpoint based on status
-        let endpoint = `/api/orders/${selectedOrder.id}`;
-        let method = 'PUT';
-        let body = { status: modalStatus, ...riderData };
-
-        if (modalStatus === 'Assigned' || modalStatus === 'Out for Delivery') {
-          endpoint = `/api/orders/${selectedOrder.id}/approve`;
-          body = riderData;
-        } else if (modalStatus === 'Rejected') {
-          endpoint = `/api/orders/${selectedOrder.id}/reject`;
-          body = { rejectionReason: 'Service unavailable' };
-        }
-
-        const response = await fetch(endpoint, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        });
-
-        if (!response.ok) throw new Error('Failed to update order');
-      }
-
-      if (selectedOrder.status !== modalStatus) {
-        let emailSubject = `Update on your Errand: ${selectedOrder.id}`;
-        let emailBody = `<p>Hello ${selectedOrder.clientName},</p>`;
-
-        if (modalStatus === 'Assigned' || modalStatus === 'Out for Delivery') {
-          emailSubject = `Errand ${selectedOrder.id} Approved! 🎉`;
-          emailBody += `<p>The status of your errand has been updated to <strong>${modalStatus}</strong>.</p>`;
-          if (modalRider) {
-            emailBody += `<p><strong>Your Assigned Courier:</strong> ${modalRider}</p>`;
-            emailBody += `<p><strong>Contact:</strong> ${modalRiderPhone || 'N/A'}</p>`;
-            emailBody += `<p><strong>Vehicle:</strong> ${modalRiderColor || ''} ${modalRiderVehicle || ''} &mdash; ${modalRiderPlate || 'N/A'}</p>`;
-          }
-        } else if (modalStatus === 'Rejected') {
-          emailSubject = `Errand ${selectedOrder.id} Status Update`;
-          emailBody += `<p>Unfortunately, your errand could not be fulfilled at this time. Please contact support for more information.</p>`;
-        } else {
-          emailBody += `<p>The status of your errand has been updated to <strong>${modalStatus}</strong>.</p>`;
-        }
-        emailBody += `<p>Thank you for using Run My Errand.</p>`;
-
-        fetch('/api/send-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: selectedOrder.clientEmail,
-            subject: emailSubject,
-            html: emailBody
-          })
-        }).catch(err => console.warn('Email notification failed', err));
-      }
+      await updateOrder(selectedOrder.id, {
+        status: modalStatus,
+        ...riderData
+      });
 
       triggerToast('Order updated successfully!', 'success');
       setModalOpen(false);
@@ -263,6 +246,18 @@ function OrdersTab({ triggerToast }) {
     }
   };
 
+  const handleDeleteOrder = async (id) => {
+    try {
+      await deleteOrder(id);
+      triggerToast('Order deleted.', 'info');
+      setConfirmDeleteOrder(null);
+      if (selectedOrder?.id === id) setModalOpen(false);
+      fetchOrders();
+    } catch {
+      triggerToast('Failed to delete order.', 'danger');
+    }
+  };
+
   const badgeClass = s => ({
     'Pending Assignment': 'badge-pending',
     'Order Ready': 'badge-assigned',
@@ -270,19 +265,14 @@ function OrdersTab({ triggerToast }) {
     Completed: 'badge-completed',
   }[s] || 'badge-pending');
 
-  const statusEmoji = s => ({
-    'Pending Assignment': '⏳',
-    'Order Ready': '✅',
-    'Out for Delivery': '🚴',
-    Completed: '📦',
-  }[s] || '⏳');
-
   const filtered = orders.filter(o => {
     const matchSearch =
       !search ||
       (o.clientName || '').toLowerCase().includes(search.toLowerCase()) ||
       (o.clientEmail || '').toLowerCase().includes(search.toLowerCase()) ||
-      (o.category || '').toLowerCase().includes(search.toLowerCase());
+      (o.category || '').toLowerCase().includes(search.toLowerCase()) ||
+      (o.pickupLocation || '').toLowerCase().includes(search.toLowerCase()) ||
+      (o.dropoffLocation || '').toLowerCase().includes(search.toLowerCase());
     const matchStatus = filterStatus === 'All' || o.status === filterStatus;
     return matchSearch && matchStatus;
   });
@@ -301,7 +291,7 @@ function OrdersTab({ triggerToast }) {
         <div className="admin-stat-card">
           <span className="stat-label">Total Orders</span>
           <span className="stat-value">{counts.total}</span>
-          <span className="stat-sub">All time</span>
+          <span className="stat-sub">All bookings</span>
         </div>
         <div className="admin-stat-card">
           <span className="stat-label">Pending</span>
@@ -331,7 +321,7 @@ function OrdersTab({ triggerToast }) {
               </span>
               <input
                 className="admin-search"
-                placeholder="Search client, category…"
+                placeholder="Search client, category, route…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
@@ -361,9 +351,9 @@ function OrdersTab({ triggerToast }) {
                 <th>Order ID</th>
                 <th>Client</th>
                 <th>Category</th>
-                <th>Urgency</th>
+                <th>Route (Pickup → Dropoff)</th>
+                <th>Assigned Courier</th>
                 <th>Status</th>
-                <th>Date</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -385,29 +375,47 @@ function OrdersTab({ triggerToast }) {
                   <tr key={order.id}>
                     <td>
                       <code style={{ fontSize: '0.78rem', background: 'var(--bg-light)', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
-                        {String(order.id).slice(0, 10)}…
+                        {String(order.id).slice(0, 10)}
                       </code>
                     </td>
                     <td>
                       <div style={{ fontWeight: 600 }}>{order.clientName || '—'}</div>
                       <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{order.clientEmail}</div>
                     </td>
-                    <td>{order.category}</td>
                     <td>
-                      <span className={`badge ${order.urgency === 'Express' ? 'badge-urgent' : 'badge-progress'}`}>
+                      <div>{order.category}</div>
+                      <span className={`badge ${order.urgency === 'Express' ? 'badge-urgent' : 'badge-progress'}`} style={{ marginTop: '0.2rem' }}>
                         {order.urgency}
                       </span>
                     </td>
                     <td>
-                      <span className={`badge ${badgeClass(order.status)}`}>{order.status}</span>
-                    </td>
-                    <td style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                      {order.createdAt ? new Date(order.createdAt).toLocaleString() : '—'}
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-main)', maxWidth: '240px' }}>
+                        <div>📍 {order.pickupLocation}</div>
+                        <div style={{ marginTop: '0.2rem' }}>🎯 {order.dropoffLocation}</div>
+                      </div>
                     </td>
                     <td>
-                      <button className="btn btn-secondary btn-sm" onClick={() => openModal(order)}>
-                        <Icon name="Edit" size={13} /> Update
-                      </button>
+                      {order.riderName ? (
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{order.riderName}</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{order.riderPlate || order.riderPhone}</div>
+                        </div>
+                      ) : (
+                        <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>Unassigned</span>
+                      )}
+                    </td>
+                    <td>
+                      <span className={`badge ${badgeClass(order.status)}`}>{order.status}</span>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '0.4rem' }}>
+                        <button className="btn btn-secondary btn-sm" onClick={() => openModal(order)}>
+                          <Icon name="Edit" size={13} /> Manage
+                        </button>
+                        <button className="btn btn-danger btn-sm" title="Delete Order" onClick={() => setConfirmDeleteOrder(order.id)}>
+                          <Icon name="Trash" size={13} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -419,14 +427,15 @@ function OrdersTab({ triggerToast }) {
 
       {/* Edit Order Modal */}
       <div className={`admin-modal-overlay ${modalOpen ? 'open' : ''}`} onClick={() => setModalOpen(false)}>
-        <div className="admin-modal" style={{ maxWidth: 850, padding: 0, overflow: 'hidden', display: 'flex', minHeight: 450 }} onClick={e => e.stopPropagation()}>
+        <div className="admin-modal" style={{ maxWidth: 880, padding: 0, overflow: 'hidden', display: 'flex', minHeight: 480 }} onClick={e => e.stopPropagation()}>
 
           <div style={{ flex: 1, padding: '2rem 2.5rem', borderRight: '1px solid var(--border-color)', overflowY: 'auto' }}>
             <button className="admin-modal-close" onClick={() => setModalOpen(false)}><Icon name="X" size={16} /></button>
-            <h2>Update Order</h2>
-            <p className="modal-subtitle">ID: {selectedOrder?.id}</p>
+            <h2>Manage Order & Dispatch</h2>
+            <p className="modal-subtitle">ID: {selectedOrder?.id} &bull; Client: {selectedOrder?.clientName}</p>
+
             <div className="form-group">
-              <label className="form-label">Status</label>
+              <label className="form-label">Order Status</label>
               <Select value={modalStatus} onValueChange={setModalStatus}>
                 <SelectTrigger className="form-select">
                   <SelectValue placeholder="Select Status" />
@@ -436,65 +445,93 @@ function OrdersTab({ triggerToast }) {
                   <SelectItem value="Order Ready">Order Ready</SelectItem>
                   <SelectItem value="Out for Delivery">Out for Delivery</SelectItem>
                   <SelectItem value="Completed">Completed</SelectItem>
+                  <SelectItem value="Rejected">Rejected</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            {modalStatus === 'Out for Delivery' && (
-              <div style={{ background: 'var(--bg-light)', borderRadius: 'var(--radius-sm)', padding: '1rem', marginTop: '1.25rem', border: '1px solid var(--border-color)' }}>
-                <p style={{ fontSize: '0.85rem', color: 'var(--primary)', marginBottom: '1rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  Enter Courier Details
-                </p>
-                <div className="form-group" style={{ marginBottom: '1rem' }}>
-                  <label className="form-label">Rider Name</label>
-                  <input className="form-input" placeholder="e.g. John Doe" value={modalRider} onChange={e => setModalRider(e.target.value)} />
+
+            {/* Courier Assignment Section */}
+            <div style={{ background: 'var(--bg-light)', borderRadius: 'var(--radius-sm)', padding: '1.25rem', marginTop: '1.25rem', border: '1px solid var(--border-color)' }}>
+              <p style={{ fontSize: '0.85rem', color: 'var(--primary)', marginBottom: '1rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Courier & Vehicle Assignment
+              </p>
+
+              <div className="form-group" style={{ marginBottom: '1rem' }}>
+                <label className="form-label">Quick Assign from Registered Team</label>
+                <Select value={modalRider || 'manual'} onValueChange={v => v !== 'manual' && handleSelectCourierPreset(v)}>
+                  <SelectTrigger className="form-select">
+                    <SelectValue placeholder="Choose an employee..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="manual">-- Select Employee --</SelectItem>
+                    {riders.map(r => (
+                      <SelectItem key={r.id} value={r.name}>
+                        {r.name} &mdash; {r.vehicleType} ({r.plate || 'No plate'})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '1rem' }}>
+                <label className="form-label">Courier Name</label>
+                <input className="form-input" placeholder="e.g. Kofi Mensah" value={modalRider} onChange={e => setModalRider(e.target.value)} />
+              </div>
+
+              <div className="form-row" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
+                  <label className="form-label">Phone</label>
+                  <input className="form-input" placeholder="e.g. 0244000000" value={modalRiderPhone} onChange={e => setModalRiderPhone(e.target.value)} />
                 </div>
-                <div className="form-row" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-                  <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-                    <label className="form-label">Phone</label>
-                    <input className="form-input" placeholder="e.g. 0244000000" value={modalRiderPhone} onChange={e => setModalRiderPhone(e.target.value)} />
-                  </div>
-                  <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-                    <label className="form-label">Vehicle Type</label>
-                    <Select value={modalRiderVehicle || 'none'} onValueChange={v => setModalRiderVehicle(v === 'none' ? '' : v)}>
-                      <SelectTrigger className="form-select">
-                        <SelectValue placeholder="Select…" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Select…</SelectItem>
-                        <SelectItem value="Motorcycle">Motorcycle</SelectItem>
-                        <SelectItem value="Car">Car</SelectItem>
-                        <SelectItem value="Van">Van</SelectItem>
-                        <SelectItem value="Tricycle">Tricycle</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="form-row" style={{ display: 'flex', gap: '1rem' }}>
-                  <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-                    <label className="form-label">Plate / Reg. Number</label>
-                    <input className="form-input" placeholder="e.g. GT-1234-22" value={modalRiderPlate} onChange={e => setModalRiderPlate(e.target.value)} />
-                  </div>
-                  <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-                    <label className="form-label">Vehicle Color</label>
-                    <input className="form-input" placeholder="e.g. Red" value={modalRiderColor} onChange={e => setModalRiderColor(e.target.value)} />
-                  </div>
+                <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
+                  <label className="form-label">Vehicle Type</label>
+                  <Select value={modalRiderVehicle || 'none'} onValueChange={v => setModalRiderVehicle(v === 'none' ? '' : v)}>
+                    <SelectTrigger className="form-select">
+                      <SelectValue placeholder="Select…" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Select…</SelectItem>
+                      <SelectItem value="Motorcycle">Motorcycle</SelectItem>
+                      <SelectItem value="Car">Car</SelectItem>
+                      <SelectItem value="Van">Van</SelectItem>
+                      <SelectItem value="Tricycle">Tricycle</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-            )}
 
+              <div className="form-row" style={{ display: 'flex', gap: '1rem' }}>
+                <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
+                  <label className="form-label">Plate Number</label>
+                  <input className="form-input" placeholder="e.g. GW-4521-23" value={modalRiderPlate} onChange={e => setModalRiderPlate(e.target.value)} />
+                </div>
+                <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
+                  <label className="form-label">Vehicle Color</label>
+                  <input className="form-input" placeholder="e.g. Black" value={modalRiderColor} onChange={e => setModalRiderColor(e.target.value)} />
+                </div>
+              </div>
+            </div>
 
-            <button className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }} onClick={saveOrder} disabled={saving}>
-              {saving ? 'Saving…' : 'Save Changes'}
-            </button>
+            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem' }}>
+              <button className="btn btn-primary" style={{ flex: 1 }} onClick={saveOrder} disabled={saving}>
+                {saving ? 'Saving…' : 'Save Changes'}
+              </button>
+              <button className="btn btn-danger" type="button" onClick={() => setConfirmDeleteOrder(selectedOrder.id)}>
+                Delete Order
+              </button>
+            </div>
           </div>
 
+          {/* Chat Side */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--bg-main)' }}>
-            <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)', fontWeight: 600, fontSize: '0.95rem' }}>Order Chat</div>
-            <div style={{ flex: 1, padding: '1rem 1.5rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '400px' }}>
-              {messages.length === 0 ? <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', marginTop: '2rem' }}>No messages yet. Send a message to the client.</p> : null}
+            <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)', fontWeight: 600, fontSize: '0.95rem' }}>
+              Customer Chat
+            </div>
+            <div style={{ flex: 1, padding: '1rem 1.5rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '420px' }}>
+              {messages.length === 0 ? <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', marginTop: '2rem' }}>No messages yet. Send a note to the client.</p> : null}
               {messages.map(m => (
                 <div key={m.id} style={{ alignSelf: m.senderType === 'admin' ? 'flex-end' : 'flex-start', background: m.senderType === 'admin' ? 'var(--primary)' : 'var(--bg-card)', color: m.senderType === 'admin' ? '#fff' : 'var(--text-main)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', fontSize: '0.85rem', maxWidth: '85%', border: m.senderType === 'admin' ? 'none' : '1px solid var(--border-color)' }}>
-                  <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '0.2rem' }}>{m.senderName}</div>
+                  <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '0.2rem' }}>{m.senderName} ({m.senderType})</div>
                   {m.text}
                 </div>
               ))}
@@ -507,12 +544,19 @@ function OrdersTab({ triggerToast }) {
 
         </div>
       </div>
+
+      <ConfirmDialog
+        open={!!confirmDeleteOrder}
+        message="This order will be permanently deleted from the database. This action cannot be undone."
+        onConfirm={() => handleDeleteOrder(confirmDeleteOrder)}
+        onCancel={() => setConfirmDeleteOrder(null)}
+      />
     </>
   );
 }
 
 /* ═══════════════════════════════════════════════════
-   SERVICES TAB
+   SERVICES & PRICING TAB (Total Control for Admin)
 ═══════════════════════════════════════════════════ */
 const ICON_OPTIONS = ['Briefcase', 'Truck', 'Plane', 'ShoppingCart', 'Home', 'FileText', 'Camera', 'Wrench', 'Package', 'Mail'];
 const BADGE_OPTIONS = ['Corporate', 'Logistics', 'Support', 'Personal', 'Property', 'Compliance', 'Inspections', 'Premium'];
@@ -567,7 +611,7 @@ function ServicesTab({ triggerToast }) {
         id: editingService?.id,
       };
       await saveService(payload);
-      triggerToast(editingService ? 'Service updated!' : 'Service added!', 'success');
+      triggerToast(editingService ? 'Service & pricing updated!' : 'New service added successfully!', 'success');
       setModalOpen(false);
       loadServices();
     } catch (err) {
@@ -599,9 +643,14 @@ function ServicesTab({ triggerToast }) {
     <>
       <div className="admin-card">
         <div className="admin-card-header">
-          <h2>Services Catalogue <span style={{ fontWeight: 400, color: 'var(--text-muted)', fontSize: '0.85rem' }}>({services.length} services)</span></h2>
+          <div>
+            <h2>Services & Pricing Control</h2>
+            <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              Manage all service categories, edit base pricing (in GHS), and publish new service offerings.
+            </p>
+          </div>
           <button className="btn btn-primary" onClick={openAddModal}>
-            <Icon name="Plus" size={15} /> Add Service
+            <Icon name="Plus" size={15} /> Add New Service
           </button>
         </div>
 
@@ -611,7 +660,7 @@ function ServicesTab({ triggerToast }) {
           <div className="admin-empty">
             <div className="admin-empty-icon"><Icon name="Wrench" size={24} /></div>
             <h3>No services yet</h3>
-            <p>Click "Add Service" to create your first offering.</p>
+            <p>Click "Add New Service" to create your first offering.</p>
             <button className="btn btn-primary" onClick={openAddModal}><Icon name="Plus" size={15} /> Add Service</button>
           </div>
         ) : (
@@ -625,7 +674,7 @@ function ServicesTab({ triggerToast }) {
                     <span className="badge badge-progress" style={{ marginTop: '0.25rem', display: 'inline-flex' }}>{svc.badge}</span>
                   </div>
                   <div className="action-group" style={{ flexShrink: 0 }}>
-                    <button className="btn-icon" title="Edit" onClick={() => openEditModal(svc)}><Icon name="Edit" size={14} /></button>
+                    <button className="btn-icon" title="Edit Pricing & Details" onClick={() => openEditModal(svc)}><Icon name="Edit" size={14} /></button>
                     <button className="btn-icon danger" title="Delete" onClick={() => setConfirmDelete(svc.id)}><Icon name="Trash" size={14} /></button>
                   </div>
                 </div>
@@ -635,8 +684,14 @@ function ServicesTab({ triggerToast }) {
                     {svc.bullets.map((b, i) => b && <li key={i} style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '0.15rem' }}>{b}</li>)}
                   </ul>
                 )}
-                <div className="service-item-price">
-                  GHS {svc.basePrice} <span>/ base price</span>
+                <div className="service-item-price" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
+                  <div>
+                    <strong style={{ fontSize: '1.15rem', color: 'var(--primary)' }}>GHS {svc.basePrice}</strong>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '0.35rem' }}>base price</span>
+                  </div>
+                  <button className="btn btn-secondary btn-sm" onClick={() => openEditModal(svc)}>
+                    Change Price
+                  </button>
                 </div>
               </div>
             ))}
@@ -646,15 +701,15 @@ function ServicesTab({ triggerToast }) {
 
       {/* Add/Edit Modal */}
       <div className={`admin-modal-overlay ${modalOpen ? 'open' : ''}`} onClick={() => setModalOpen(false)}>
-        <div className="admin-modal" style={{ maxWidth: 560 }} onClick={e => e.stopPropagation()}>
+        <div className="admin-modal" style={{ maxWidth: 580 }} onClick={e => e.stopPropagation()}>
           <button className="admin-modal-close" onClick={() => setModalOpen(false)}><Icon name="X" size={16} /></button>
-          <h2>{editingService ? 'Edit Service' : 'New Service'}</h2>
-          <p className="modal-subtitle">{editingService ? 'Update the service details below.' : 'Fill in the details for your new service offering.'}</p>
+          <h2>{editingService ? 'Edit Service & Pricing' : 'Add New Service'}</h2>
+          <p className="modal-subtitle">{editingService ? 'Update pricing and service description.' : 'Set up a new service with custom pricing.'}</p>
 
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">Title *</label>
-              <input className="form-input" placeholder="e.g. Parcel Delivery" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
+              <label className="form-label">Service Title *</label>
+              <input className="form-input" placeholder="e.g. Express Courier" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
             </div>
             <div className="form-group">
               <label className="form-label">Badge / Category</label>
@@ -682,8 +737,15 @@ function ServicesTab({ triggerToast }) {
               </Select>
             </div>
             <div className="form-group">
-              <label className="form-label">Base Price (GHS)</label>
-              <input className="form-input" type="number" min="0" value={form.basePrice} onChange={e => setForm(f => ({ ...f, basePrice: e.target.value }))} />
+              <label className="form-label">Base Price (GHS) *</label>
+              <input 
+                className="form-input" 
+                type="number" 
+                min="0" 
+                value={form.basePrice} 
+                onChange={e => setForm(f => ({ ...f, basePrice: e.target.value }))} 
+                style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--primary)' }}
+              />
             </div>
           </div>
 
@@ -693,32 +755,391 @@ function ServicesTab({ triggerToast }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Bullet Points (up to 3)</label>
+            <label className="form-label">Key Features / Bullets (up to 3)</label>
             {[0, 1, 2].map(i => (
               <input
                 key={i}
                 className="form-input"
                 style={{ marginBottom: '0.5rem' }}
-                placeholder={`Point ${i + 1}…`}
+                placeholder={`Feature point ${i + 1}…`}
                 value={form.bullets[i] || ''}
                 onChange={e => updateBullet(i, e.target.value)}
               />
             ))}
           </div>
 
-          <button className="btn btn-primary" style={{ width: '100%', marginTop: '0.25rem' }} onClick={handleSave} disabled={saving}>
-            {saving ? 'Saving…' : editingService ? 'Update Service' : 'Add Service'}
+          <button className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem' }} onClick={handleSave} disabled={saving}>
+            {saving ? 'Saving…' : editingService ? 'Save Price & Details' : 'Create Service'}
           </button>
         </div>
       </div>
 
       <ConfirmDialog
         open={!!confirmDelete}
-        message="This service will be permanently deleted and removed from the website. This cannot be undone."
+        message="This service will be permanently deleted and removed from the website and client calculator. This cannot be undone."
         onConfirm={() => handleDelete(confirmDelete)}
         onCancel={() => setConfirmDelete(null)}
       />
     </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════
+   EMPLOYEES / COURIERS MANAGEMENT TAB
+═══════════════════════════════════════════════════ */
+function EmployeesTab({ triggerToast }) {
+  const [riders, setRiders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingRider, setEditingRider] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    vehicleType: 'Motorcycle',
+    plate: '',
+    color: '',
+    status: 'active'
+  });
+
+  const loadRiders = useCallback(async () => {
+    try {
+      const data = await getRiders();
+      setRiders(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadRiders(); }, [loadRiders]);
+
+  const openAddModal = () => {
+    setEditingRider(null);
+    setForm({ name: '', email: '', phone: '', vehicleType: 'Motorcycle', plate: '', color: '', status: 'active' });
+    setModalOpen(true);
+  };
+
+  const openEditModal = (r) => {
+    setEditingRider(r);
+    setForm({
+      name: r.name || '',
+      email: r.email || '',
+      phone: r.phone || '',
+      vehicleType: r.vehicleType || 'Motorcycle',
+      plate: r.plate || '',
+      color: r.color || '',
+      status: r.status || 'active'
+    });
+    setModalOpen(true);
+  };
+
+  const handleSave = async () => {
+    if (!form.name.trim() || !form.phone.trim()) {
+      triggerToast('Employee Name and Phone number are required.', 'danger');
+      return;
+    }
+    try {
+      await saveRider({ ...form, id: editingRider?.id });
+      triggerToast(editingRider ? 'Employee updated!' : 'New courier added to roster!', 'success');
+      setModalOpen(false);
+      loadRiders();
+    } catch {
+      triggerToast('Failed to save employee.', 'danger');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteRider(id);
+      triggerToast('Employee removed.', 'info');
+      setConfirmDelete(null);
+      loadRiders();
+    } catch {
+      triggerToast('Failed to remove employee.', 'danger');
+    }
+  };
+
+  const toggleStatus = async (r) => {
+    const nextStatus = r.status === 'active' ? 'inactive' : 'active';
+    try {
+      await saveRider({ ...r, status: nextStatus });
+      triggerToast(`Courier status changed to ${nextStatus}`, 'success');
+      loadRiders();
+    } catch {
+      triggerToast('Failed to change status', 'danger');
+    }
+  };
+
+  return (
+    <>
+      <div className="admin-card">
+        <div className="admin-card-header">
+          <div>
+            <h2>Courier & Employee Roster</h2>
+            <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              Manage couriers, vehicle assignments, duty status, and contact information.
+            </p>
+          </div>
+          <button className="btn btn-primary" onClick={openAddModal}>
+            <Icon name="Plus" size={15} /> Add Employee
+          </button>
+        </div>
+
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Name & Email</th>
+                <th>Phone</th>
+                <th>Vehicle Type</th>
+                <th>Plate Number</th>
+                <th>Vehicle Color</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr><td colSpan="7" style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>Loading employees…</td></tr>
+              ) : riders.length === 0 ? (
+                <tr>
+                  <td colSpan="7">
+                    <div className="admin-empty">
+                      <div className="admin-empty-icon"><Icon name="Truck" size={24} /></div>
+                      <h3>No couriers on roster</h3>
+                      <p>Add your first delivery employee to start dispatching.</p>
+                      <button className="btn btn-primary btn-sm" onClick={openAddModal} style={{ marginTop: '0.5rem' }}>
+                        Add Employee
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                riders.map(r => (
+                  <tr key={r.id}>
+                    <td>
+                      <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>{r.name}</div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{r.email || 'employee@errands.com'}</div>
+                    </td>
+                    <td>{r.phone}</td>
+                    <td>
+                      <span className="badge badge-progress">{r.vehicleType || 'Motorcycle'}</span>
+                    </td>
+                    <td>
+                      <code>{r.plate || 'N/A'}</code>
+                    </td>
+                    <td>{r.color || 'Standard'}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className={`badge ${r.status === 'active' ? 'badge-completed' : 'badge-pending'}`}
+                        style={{ cursor: 'pointer', border: 'none' }}
+                        onClick={() => toggleStatus(r)}
+                        title="Click to toggle status"
+                      >
+                        {r.status === 'active' ? 'Active' : 'Inactive'}
+                      </button>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '0.4rem' }}>
+                        <button className="btn btn-secondary btn-sm" onClick={() => openEditModal(r)}>
+                          <Icon name="Edit" size={13} /> Edit
+                        </button>
+                        <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(r.id)}>
+                          <Icon name="Trash" size={13} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Add / Edit Employee Modal */}
+      <div className={`admin-modal-overlay ${modalOpen ? 'open' : ''}`} onClick={() => setModalOpen(false)}>
+        <div className="admin-modal" style={{ maxWidth: 500 }} onClick={e => e.stopPropagation()}>
+          <button className="admin-modal-close" onClick={() => setModalOpen(false)}><Icon name="X" size={16} /></button>
+          <h2>{editingRider ? 'Edit Employee Details' : 'Add New Employee'}</h2>
+          <p className="modal-subtitle">Register couriers for delivery dispatches.</p>
+
+          <div className="form-group">
+            <label className="form-label">Full Name *</label>
+            <input className="form-input" placeholder="e.g. Kofi Mensah" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Phone *</label>
+              <input className="form-input" placeholder="+233 24 000 0000" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Email</label>
+              <input className="form-input" placeholder="courier@errands.com" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Vehicle Type</label>
+              <Select value={form.vehicleType} onValueChange={v => setForm(f => ({ ...f, vehicleType: v }))}>
+                <SelectTrigger className="form-select">
+                  <SelectValue placeholder="Select Vehicle" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Motorcycle">Motorcycle</SelectItem>
+                  <SelectItem value="Car">Car</SelectItem>
+                  <SelectItem value="Van">Van</SelectItem>
+                  <SelectItem value="Tricycle">Tricycle</SelectItem>
+                  <SelectItem value="Bicycle">Bicycle</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Plate / Registration</label>
+              <input className="form-input" placeholder="GW-4521-23" value={form.plate} onChange={e => setForm(f => ({ ...f, plate: e.target.value }))} />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Vehicle Color</label>
+              <input className="form-input" placeholder="e.g. Black" value={form.color} onChange={e => setForm(f => ({ ...f, color: e.target.value }))} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Status</label>
+              <Select value={form.status} onValueChange={v => setForm(f => ({ ...f, status: v }))}>
+                <SelectTrigger className="form-select">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active (On Call)</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <button className="btn btn-primary" style={{ width: '100%', marginTop: '0.75rem' }} onClick={handleSave}>
+            {editingRider ? 'Save Employee' : 'Add Employee'}
+          </button>
+        </div>
+      </div>
+
+      <ConfirmDialog
+        open={!!confirmDelete}
+        message="This employee will be removed from the courier roster."
+        onConfirm={() => handleDelete(confirmDelete)}
+        onCancel={() => setConfirmDelete(null)}
+      />
+    </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════
+   USERS / CLIENTS TAB
+═══════════════════════════════════════════════════ */
+function UsersTab({ triggerToast }) {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+
+  const loadUsers = useCallback(async () => {
+    try {
+      const data = await getUsers();
+      setUsers(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadUsers(); }, [loadUsers]);
+
+  const handleRoleChange = async (uid, newRole) => {
+    try {
+      await updateUserRole(uid, newRole);
+      triggerToast(`User role updated to ${newRole}`, 'success');
+      loadUsers();
+    } catch {
+      triggerToast('Failed to update role', 'danger');
+    }
+  };
+
+  const filtered = users.filter(u =>
+    !search ||
+    (u.name || '').toLowerCase().includes(search.toLowerCase()) ||
+    (u.email || '').toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="admin-card">
+      <div className="admin-card-header">
+        <div>
+          <h2>Clients & System Users</h2>
+          <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            View registered clients and manage roles (Client, Employee, Admin).
+          </p>
+        </div>
+        <div className="admin-search-wrapper">
+          <span className="admin-search-icon"><Icon name="Search" size={15} /></span>
+          <input className="admin-search" placeholder="Search user by name or email…" value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
+      </div>
+
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Phone</th>
+              <th>Role</th>
+              <th>Change Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr><td colSpan="4" style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>Loading users…</td></tr>
+            ) : filtered.length === 0 ? (
+              <tr><td colSpan="4" style={{ textAlign: 'center', padding: '2rem' }}>No users found.</td></tr>
+            ) : (
+              filtered.map(u => (
+                <tr key={u.uid}>
+                  <td>
+                    <div style={{ fontWeight: 700 }}>{u.name || 'Anonymous User'}</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{u.email}</div>
+                  </td>
+                  <td>{u.phone || 'N/A'}</td>
+                  <td>
+                    <span className={`badge ${u.role === 'admin' ? 'badge-urgent' : u.role === 'employee' ? 'badge-assigned' : 'badge-completed'}`}>
+                      {u.role === 'admin' ? '👑 Admin' : u.role === 'employee' ? '🚴 Employee' : '👤 Client'}
+                    </span>
+                  </td>
+                  <td>
+                    <Select value={u.role || 'user'} onValueChange={val => handleRoleChange(u.uid, val)}>
+                      <SelectTrigger className="form-select" style={{ width: '140px', height: '34px', fontSize: '0.82rem' }}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="user">Client</SelectItem>
+                        <SelectItem value="employee">Employee</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
 
@@ -749,7 +1170,6 @@ function ContactTab({ triggerToast, setBadgeCount }) {
   const markStatus = async (id, status) => {
     try {
       await updateContactStatus(id, status);
-      // Optimistic update
       setMessages(prev => prev.map(m => m.id === id ? { ...m, status } : m));
       if (selected?.id === id) setSelected(m => ({ ...m, status }));
       triggerToast(`Marked as ${status}.`, 'success');
@@ -802,7 +1222,6 @@ function ContactTab({ triggerToast, setBadgeCount }) {
 
   return (
     <>
-      {/* Stats */}
       <div className="admin-stats-row" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))' }}>
         <div className="admin-stat-card">
           <span className="stat-label">Total Tickets</span>
@@ -823,7 +1242,6 @@ function ContactTab({ triggerToast, setBadgeCount }) {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 380px' : '1fr', gap: '1.25rem', alignItems: 'start' }}>
-        {/* Inbox list */}
         <div className="admin-card">
           <div className="admin-card-header">
             <h2>Inbox {unreadCount > 0 && <span className="badge badge-unread" style={{ marginLeft: '0.5rem' }}>{unreadCount} new</span>}</h2>
@@ -882,7 +1300,6 @@ function ContactTab({ triggerToast, setBadgeCount }) {
           )}
         </div>
 
-        {/* Detail pane */}
         {selected && (
           <div className="admin-card" style={{ position: 'sticky', top: 'calc(var(--header-height) + 1rem)' }}>
             <div className="admin-card-header" style={{ justifyContent: 'space-between' }}>
@@ -948,7 +1365,6 @@ function ContactTab({ triggerToast, setBadgeCount }) {
   );
 }
 
-
 /* ═══════════════════════════════════════════════════
    MAIN ADMIN PAGE
 ═══════════════════════════════════════════════════ */
@@ -964,7 +1380,9 @@ export default function Admin() {
 
   const tabs = [
     { id: 'orders', label: 'Orders', icon: 'Package' },
-    { id: 'services', label: 'Services', icon: 'Wrench' },
+    { id: 'services', label: 'Services & Pricing', icon: 'Wrench' },
+    { id: 'employees', label: 'Employees & Couriers', icon: 'Truck' },
+    { id: 'users', label: 'Clients & Users', icon: 'Users' },
     { id: 'contact', label: 'Contact', icon: 'Mail', badge: contactBadge },
   ];
 
@@ -976,7 +1394,7 @@ export default function Admin() {
       <aside className="admin-sidebar">
         <div className="admin-sidebar-brand">
           <h2>Errands CMS</h2>
-          <p>Admin Panel</p>
+          <p>Total Administrator Control</p>
         </div>
         <ul className="admin-nav">
           {tabs.map(tab => (
@@ -992,6 +1410,16 @@ export default function Admin() {
             </li>
           ))}
         </ul>
+
+        {/* Quick Portal Switchers */}
+        <div style={{ marginTop: 'auto', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <Link to="/employee" className="btn btn-secondary btn-sm" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', textDecoration: 'none' }}>
+            <Icon name="Truck" size={14} /> Open Courier View
+          </Link>
+          <Link to="/" className="btn btn-secondary btn-sm" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', textDecoration: 'none' }}>
+            <Icon name="ExternalLink" size={14} /> View Public Site
+          </Link>
+        </div>
       </aside>
 
       {/* Main content */}
@@ -1000,19 +1428,25 @@ export default function Admin() {
           <div>
             <h1>
               {activeTab === 'orders' && 'Orders Management'}
-              {activeTab === 'services' && 'Services Management'}
-              {activeTab === 'contact' && 'Contact Tickets'}
+              {activeTab === 'services' && 'Services & Pricing Control'}
+              {activeTab === 'employees' && 'Employee & Courier Management'}
+              {activeTab === 'users' && 'Clients & System Users'}
+              {activeTab === 'contact' && 'Contact Inquiries'}
             </h1>
             <p>
-              {activeTab === 'orders' && 'View, filter and dispatch all incoming client orders.'}
-              {activeTab === 'services' && 'Add, edit, or remove services displayed on the website.'}
-              {activeTab === 'contact' && 'Manage client enquiries and contact form submissions.'}
+              {activeTab === 'orders' && 'Full control to dispatch, reassign couriers, update status, chat with clients, or cancel bookings.'}
+              {activeTab === 'services' && 'Full control to update base prices in GHS, edit service descriptions, and add new services.'}
+              {activeTab === 'employees' && 'Manage delivery riders, assign vehicles, monitor status, and register new employees.'}
+              {activeTab === 'users' && 'View customer accounts and promote or demote user access levels.'}
+              {activeTab === 'contact' && 'Manage client enquiries and support requests.'}
             </p>
           </div>
         </div>
 
         {activeTab === 'orders' && <OrdersTab triggerToast={triggerToast} />}
         {activeTab === 'services' && <ServicesTab triggerToast={triggerToast} />}
+        {activeTab === 'employees' && <EmployeesTab triggerToast={triggerToast} />}
+        {activeTab === 'users' && <UsersTab triggerToast={triggerToast} />}
         {activeTab === 'contact' && <ContactTab triggerToast={triggerToast} setBadgeCount={setContactBadge} />}
       </main>
     </div>

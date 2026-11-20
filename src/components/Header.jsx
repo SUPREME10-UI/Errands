@@ -35,8 +35,11 @@ export default function Header() {
             
             <NavLink to="/book-now" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Book Now</NavLink>
             {currentUser && (
-              <NavLink to={userData?.role === 'admin' ? "/admin" : "/dashboard"} className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
-                {userData?.role === 'admin' ? "Admin Panel" : "Dashboard"}
+              <NavLink
+                to={userData?.role === 'admin' ? "/admin" : userData?.role === 'employee' ? "/employee" : "/dashboard"}
+                className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+              >
+                {userData?.role === 'admin' ? "Admin Panel" : userData?.role === 'employee' ? "Employee Portal" : "Dashboard"}
               </NavLink>
             )}
 
@@ -69,6 +72,8 @@ export default function Header() {
         {currentUser ? (
           userData?.role === 'admin' ? (
             <NavLink to="/admin" className="nav-link" onClick={() => setMobileOpen(false)}>Admin Panel</NavLink>
+          ) : userData?.role === 'employee' ? (
+            <NavLink to="/employee" className="nav-link" onClick={() => setMobileOpen(false)}>Employee Portal</NavLink>
           ) : (
             <NavLink to="/dashboard" className="nav-link" onClick={() => setMobileOpen(false)}>Dashboard</NavLink>
           )

@@ -210,11 +210,181 @@ export const deleteContactMessage = async (id) => {
 };
 
 /* ═══════════════════════════════════════════════════
+   ORDERS & MOCK DATA
+   ═══════════════════════════════════════════════════ */
+const defaultOrders = [
+  {
+    id: "order-101",
+    category: "Parcel Pickup & Delivery",
+    pickupLocation: "East Legon, Lagos Avenue, Accra",
+    dropoffLocation: "Airport Residential Area, 5th Circular Rd, Accra",
+    description: "Urgent contract documents and flash drive delivery. Call upon arrival.",
+    urgency: "Urgent",
+    clientName: "Abena Osei",
+    clientEmail: "abena@example.com",
+    clientPhone: "+233 24 555 1234",
+    userId: "demo-user-1",
+    status: "Out for Delivery",
+    riderName: "Kofi Mensah",
+    riderPhone: "+233 24 123 4567",
+    riderVehicleType: "Motorcycle",
+    riderPlate: "GW-4521-23",
+    riderColor: "Black",
+    createdAt: new Date(Date.now() - 3600000 * 2).toISOString()
+  },
+  {
+    id: "order-102",
+    category: "Personal & Corporate Errands",
+    pickupLocation: "Ridge Towers, 4th Floor, Accra",
+    dropoffLocation: "Registrar General's Department, Accra",
+    description: "Submit certified true copy filings and collect registration stamp receipts.",
+    urgency: "Standard",
+    clientName: "David Mensah",
+    clientEmail: "david@example.com",
+    clientPhone: "+233 20 777 9876",
+    userId: "demo-user-2",
+    status: "Order Ready",
+    riderName: "Kofi Mensah",
+    riderPhone: "+233 24 123 4567",
+    riderVehicleType: "Motorcycle",
+    riderPlate: "GW-4521-23",
+    riderColor: "Black",
+    createdAt: new Date(Date.now() - 3600000 * 4).toISOString()
+  },
+  {
+    id: "order-103",
+    category: "Shopping & Vendor Services",
+    pickupLocation: "Makola Market, Row B-14, Accra",
+    dropoffLocation: "Cantonments, Embassy Gardens, Accra",
+    description: "Procure organic produce and deliver with receipt.",
+    urgency: "Standard",
+    clientName: "Sarah Addo",
+    clientEmail: "sarah@example.com",
+    clientPhone: "+233 50 333 4444",
+    userId: "demo-user-3",
+    status: "Pending Assignment",
+    riderName: null,
+    riderPhone: null,
+    riderVehicleType: null,
+    riderPlate: null,
+    riderColor: null,
+    createdAt: new Date(Date.now() - 3600000 * 1).toISOString()
+  },
+  {
+    id: "order-104",
+    category: "Travel & Support",
+    pickupLocation: "Kotoka International Airport, Terminal 3",
+    dropoffLocation: "Kempinski Hotel Gold Coast City, Accra",
+    description: "Luggage reception protocol and transfer for international guest.",
+    urgency: "Express",
+    clientName: "Michael Owusu",
+    clientEmail: "michael@example.com",
+    clientPhone: "+233 27 111 2222",
+    userId: "demo-user-4",
+    status: "Completed",
+    riderName: "Kwame Asante",
+    riderPhone: "+233 20 987 6543",
+    riderVehicleType: "Van",
+    riderPlate: "GE-8902-22",
+    riderColor: "White",
+    createdAt: new Date(Date.now() - 3600000 * 24).toISOString()
+  }
+];
+
+export const getOrders = async () => {
+  if (isDemo) {
+    const existing = localStorage.getItem('demo_orders');
+    if (!existing || JSON.parse(existing).length === 0) {
+      localStorage.setItem('demo_orders', JSON.stringify(defaultOrders));
+      return defaultOrders;
+    }
+    const all = JSON.parse(existing);
+    all.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    return all;
+  }
+  try {
+    const res = await fetch('/api/orders');
+    if (!res.ok) throw new Error('Failed to fetch orders');
+    const list = await res.json();
+    list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    return list;
+  } catch (err) {
+    console.error('Error fetching orders:', err);
+    return [];
+  }
+};
+
+export const updateOrder = async (id, data) => {
+  if (isDemo) {
+    const all = JSON.parse(localStorage.getItem('demo_orders') || '[]');
+    const updated = all.map(o => o.id === id ? { ...o, ...data } : o);
+    localStorage.setItem('demo_orders', JSON.stringify(updated));
+    return updated.find(o => o.id === id);
+  }
+  const res = await fetch(`/api/orders/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) throw new Error('Failed to update order');
+  return await res.json();
+};
+
+export const deleteOrder = async (id) => {
+  if (isDemo) {
+    const all = JSON.parse(localStorage.getItem('demo_orders') || '[]');
+    const filtered = all.filter(o => o.id !== id);
+    localStorage.setItem('demo_orders', JSON.stringify(filtered));
+    return;
+  }
+  const res = await fetch(`/api/orders/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Failed to delete order');
+};
+
+/* ═══════════════════════════════════════════════════
    RIDERS
    ═══════════════════════════════════════════════════ */
+const defaultRiders = [
+  {
+    id: "rider-1",
+    name: "Kofi Mensah",
+    email: "employee@demo.com",
+    phone: "+233 24 123 4567",
+    vehicleType: "Motorcycle",
+    plate: "GW-4521-23",
+    color: "Black",
+    status: "active"
+  },
+  {
+    id: "rider-2",
+    name: "Kwame Asante",
+    email: "kwame@errands.com",
+    phone: "+233 20 987 6543",
+    vehicleType: "Van",
+    plate: "GE-8902-22",
+    color: "White",
+    status: "active"
+  },
+  {
+    id: "rider-3",
+    name: "Ama Boateng",
+    email: "ama@errands.com",
+    phone: "+233 55 456 7890",
+    vehicleType: "Car",
+    plate: "GT-3312-24",
+    color: "Blue",
+    status: "active"
+  }
+];
+
 export const getRiders = async () => {
   if (isDemo) {
-    return JSON.parse(localStorage.getItem('demo_riders') || '[]');
+    const existing = localStorage.getItem('demo_riders');
+    if (!existing || JSON.parse(existing).length === 0) {
+      localStorage.setItem('demo_riders', JSON.stringify(defaultRiders));
+      return defaultRiders;
+    }
+    return JSON.parse(existing);
   }
   try {
     const res = await fetch('/api/riders');
@@ -222,7 +392,7 @@ export const getRiders = async () => {
     return await res.json();
   } catch (error) {
     console.error("Error fetching riders:", error);
-    return [];
+    return defaultRiders;
   }
 };
 
@@ -261,6 +431,50 @@ export const deleteRider = async (id) => {
     method: 'DELETE'
   });
   if (!res.ok) throw new Error('Failed to delete rider');
+};
+
+/* ═══════════════════════════════════════════════════
+   USERS MANAGEMENT
+   ═══════════════════════════════════════════════════ */
+export const getUsers = async () => {
+  if (isDemo) {
+    const demoUsers = [
+      { uid: 'demo-admin-uid', name: 'Demo Administrator', email: 'admin@demo.com', role: 'admin', phone: '+233 24 000 0000', createdAt: '2025-01-15T10:00:00Z' },
+      { uid: 'demo-employee-uid', name: 'Kofi Mensah (Courier)', email: 'employee@demo.com', role: 'employee', phone: '+233 24 123 4567', createdAt: '2025-02-01T12:00:00Z' },
+      { uid: 'demo-user-1', name: 'Abena Osei', email: 'abena@example.com', role: 'user', phone: '+233 24 555 1234', createdAt: '2025-02-10T14:30:00Z' },
+      { uid: 'demo-user-2', name: 'David Mensah', email: 'david@example.com', role: 'user', phone: '+233 20 777 9876', createdAt: '2025-02-12T09:15:00Z' },
+      { uid: 'demo-user-3', name: 'Sarah Addo', email: 'sarah@example.com', role: 'user', phone: '+233 50 333 4444', createdAt: '2025-02-14T11:45:00Z' }
+    ];
+    const saved = localStorage.getItem('demo_users_list');
+    if (!saved) {
+      localStorage.setItem('demo_users_list', JSON.stringify(demoUsers));
+      return demoUsers;
+    }
+    return JSON.parse(saved);
+  }
+  try {
+    const res = await fetch('/api/users');
+    if (!res.ok) throw new Error('Failed to fetch users');
+    return await res.json();
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    return [];
+  }
+};
+
+export const updateUserRole = async (uid, role) => {
+  if (isDemo) {
+    const list = JSON.parse(localStorage.getItem('demo_users_list') || '[]');
+    const updated = list.map(u => u.uid === uid ? { ...u, role } : u);
+    localStorage.setItem('demo_users_list', JSON.stringify(updated));
+    return;
+  }
+  const res = await fetch(`/api/users/${uid}/role`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ role })
+  });
+  if (!res.ok) throw new Error('Failed to update user role');
 };
 
 

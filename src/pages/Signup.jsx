@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import authBg from '../assets/auth-bg.jpg';
+import './auth.css';
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -48,6 +50,9 @@ export default function Signup() {
 
   return (
     <div className="auth-container">
+      <div className="auth-backdrop" style={{ backgroundImage: `url(${authBg})` }} />
+      <div className="auth-overlay" />
+      
       <div className="auth-card">
         <div className="auth-header">
           <Link to="/">

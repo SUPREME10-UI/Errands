@@ -444,6 +444,30 @@ app.get('/js/env-config.js', (req, res) => {
 // ─── Postgres API Endpoints ──────────────────────────────────────────────────
 
 // 1. Users Profile
+app.get('/api/users', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT uid, email, role, name, phone, address, created_at as "createdAt" FROM users ORDER BY created_at DESC');
+    res.json(result.rows);
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
+app.put('/api/users/:uid/role', async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const { role } = req.body;
+    const result = await pool.query(
+      'UPDATE users SET role = $1 WHERE uid = $2 RETURNING uid, email, role, name, phone, address, created_at as "createdAt"',
+      [role, uid]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
+    res.json(result.rows[0]);
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
 app.get('/api/users/:uid', async (req, res) => {
   try {
     const { uid } = req.params;
@@ -623,6 +647,16 @@ app.put('/api/orders/:id', async (req, res) => {
   } catch (error) {
     console.error('Error updating order:', error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/orders/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM orders WHERE id = $1', [id]);
+    res.json({ success: true, message: 'Order deleted successfully' });
+  } catch (error) {
+    handleError(error, res);
   }
 });
 

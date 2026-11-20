@@ -18,7 +18,8 @@
   --bg-main: #F8FAFC;
   --bg-card: #FFFFFF;
   --bg-light: #F1F5F9;
-  --border-color: #E2E8F0;
+  --border: #CBD5E1;
+  --border-color: #CBD5E1;
   
   /* Status Colors */
   --success: #10B981;
@@ -75,7 +76,8 @@
   --bg-main: #070F1E;
   --bg-card: #0D1B3E;
   --bg-light: #162447;
-  --border-color: #1E2E5B;
+  --border: #334778;
+  --border-color: #334778;
   
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.3);

@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const isDemoMode = !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY.includes('YOUR_API_KEY');
+  const isDemoMode = !import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY.includes('YOUR_API_KEY') || import.meta.env.VITE_FIREBASE_API_KEY.includes('demo-api-key-safe-placeholder');
 
   useEffect(() => {
     if (isDemoMode) {
@@ -60,10 +60,22 @@ export function AuthProvider({ children }) {
 
   const login = (email, password) => {
     if (isDemoMode || email.includes('demo.com')) {
-      const role = email.toLowerCase() === 'admin@demo.com' ? 'admin' : 'user';
-      const name = role === 'admin' ? 'Demo Admin' : 'Demo User';
+      const lower = email.toLowerCase();
+      let role = 'user';
+      let name = 'Demo User';
+      let phone = '+233 24 000 0000';
+
+      if (lower === 'admin@demo.com') {
+        role = 'admin';
+        name = 'Demo Administrator';
+      } else if (lower === 'employee@demo.com' || lower === 'rider@demo.com' || lower.includes('employee') || lower.includes('rider')) {
+        role = 'employee';
+        name = 'Kofi Mensah (Courier)';
+        phone = '+233 24 123 4567';
+      }
+
       const user = { uid: `demo-${role}-uid`, email, displayName: name };
-      const data = { role, name, email, phone: "+233 24 000 0000", address: "Demo Street, Accra" };
+      const data = { role, name, email, phone, address: "Demo Street, Accra" };
 
       setCurrentUser(user);
       setUserData(data);

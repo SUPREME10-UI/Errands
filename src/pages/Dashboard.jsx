@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getMessages, sendMessage } from '../lib/dbHelper';
+import { getMessages, sendMessage, getServices } from '../lib/dbHelper';
 import './dashboard.css';
 
 // ── Helper: category data ─────────────────────────
@@ -101,6 +101,7 @@ export default function Dashboard() {
   const chatBodyRef = useRef(null);
 
   // ── Booking wizard ────────────────────────────────
+  const [categoriesList, setCategoriesList] = useState(CATEGORIES);
   const [currentStep, setCurrentStep]   = useState(1);
   const [category, setCategory]         = useState('');
   const [pickup, setPickup]             = useState('');
@@ -112,9 +113,41 @@ export default function Dashboard() {
   const [actionLoading, setActionLoading] = useState(false);
   const fileInputRef = useRef(null);
 
+  useEffect(() => {
+    const loadLiveServices = async () => {
+      try {
+        const list = await getServices();
+        if (list && list.length > 0) {
+          const iconMap = {
+            Briefcase: '🏢',
+            Truck: '📦',
+            Plane: '✈️',
+            ShoppingCart: '🛒',
+            Home: '🏠',
+            FileText: '📋',
+            Camera: '🔍',
+            Wrench: '🔧',
+            Package: '📦',
+            Mail: '✉️'
+          };
+          const mapped = list.map(s => ({
+            value: s.title,
+            base: Number(s.basePrice) || 50,
+            icon: iconMap[s.iconName] || '💼',
+            desc: s.desc
+          }));
+          setCategoriesList(mapped);
+        }
+      } catch (err) {
+        console.error("Error loading dynamic services:", err);
+      }
+    };
+    loadLiveServices();
+  }, []);
+
   // ── Cost calc ─────────────────────────────────────
   const costs = (() => {
-    const cat = CATEGORIES.find(c => c.value === category);
+    const cat = categoriesList.find(c => c.value === category) || CATEGORIES.find(c => c.value === category);
     const base = cat ? cat.base : 50;
     const urg  = URGENCY_OPTIONS.find(u => u.value === urgency);
     const surcharge = urg ? urg.price : 0;
@@ -698,7 +731,7 @@ export default function Dashboard() {
                     <h2 style={{ fontSize:'1.15rem', fontWeight:800, marginBottom:'0.35rem' }}>What service do you need?</h2>
                     <p style={{ color:'var(--text-muted)', fontSize:'0.85rem', marginBottom:'1.25rem' }}>Choose the category that best fits your errand.</p>
                     <div className="cat-grid">
-                      {CATEGORIES.map(cat => (
+                      {categoriesList.map(cat => (
                         <div
                           key={cat.value}
                           className={`cat-card ${category === cat.value ? 'selected' : ''}`}
@@ -725,7 +758,7 @@ export default function Dashboard() {
                         <Icon name="pin" size={16} />
                         <input
                           id="pickup-input"
-                          className="route-input"
+                          className="route-input location-input-field"
                           type="text"
                           placeholder="E.g., Plot 12, East Legon, Accra"
                           value={pickup}
@@ -742,7 +775,7 @@ export default function Dashboard() {
                         <Icon name="target" size={16} />
                         <input
                           id="dropoff-input"
-                          className="route-input"
+                          className="route-input location-input-field"
                           type="text"
                           placeholder="E.g., Airport Residential Area, Accra"
                           value={dropoff}

@@ -3,7 +3,7 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const rawApiKey = import.meta.env.VITE_FIREBASE_API_KEY;
-const isDemoMode = !rawApiKey || rawApiKey.includes('YOUR_API_KEY');
+const isDemoMode = !rawApiKey || rawApiKey.includes('YOUR_API_KEY') || rawApiKey.includes('demo-api-key-safe-placeholder');
 
 const firebaseConfig = {
   apiKey: isDemoMode ? 'demo-api-key-safe-placeholder' : rawApiKey,
@@ -18,12 +18,18 @@ let app;
 let auth;
 let db;
 
-try {
-  app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  db = getFirestore(app);
-} catch (error) {
-  console.warn("Firebase initialization warning (running in demo mode):", error.message);
+if (!isDemoMode) {
+  try {
+    app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+  } catch (error) {
+    console.warn("Firebase initialization warning (running in demo mode):", error.message);
+  }
+} else {
+  // Demo mode: no real Firebase services
+  auth = null;
+  db = null;
 }
 
 export { auth, db };

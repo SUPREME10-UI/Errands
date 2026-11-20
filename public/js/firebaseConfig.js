@@ -13,10 +13,10 @@ const env = (typeof window !== 'undefined' && window.__ENV__)
   : (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : {});
 
 const rawApiKey = env.VITE_FIREBASE_API_KEY;
-const isDemo = !rawApiKey || rawApiKey.includes('YOUR_API_KEY');
+const isDemo = !rawApiKey || rawApiKey.includes('YOUR_API_KEY') || rawApiKey.includes('demo-api-key-safe-placeholder');
 
 const firebaseConfig = {
-  apiKey:            isDemo ? 'demo-api-key-safe-placeholder' : rawApiKey,
+  apiKey:            rawApiKey,
   authDomain:        env.VITE_FIREBASE_AUTH_DOMAIN || 'demo-project.firebaseapp.com',
   projectId:         env.VITE_FIREBASE_PROJECT_ID || 'demo-project',
   storageBucket:     env.VITE_FIREBASE_STORAGE_BUCKET || 'demo-project.appspot.com',
@@ -25,17 +25,19 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase safely
-let app, auth, db;
-try {
-  app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  db = getFirestore(app);
-} catch (e) {
-  console.warn("Firebase client initialization warning:", e.message);
+let app = null, auth = null, db = null;
+if (!isDemo && rawApiKey) {
+  try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+  } catch (e) {
+    console.warn("Firebase client initialization warning:", e.message);
+  }
 }
 
 export { 
-  auth, 
+  isDemo, 
   db,
   onAuthStateChanged,
   signOut,

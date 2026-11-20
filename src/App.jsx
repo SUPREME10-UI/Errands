@@ -18,11 +18,12 @@ import Admin from './pages/Admin';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import BookNow from './pages/BookNow';
+import Employee from './pages/Employee';
 
 const AppContent = () => {
   const location = useLocation();
   const { currentUser, userData, logout } = useAuth();
-  const isAdmin = location.pathname.startsWith('/admin');
+  const isPortal = location.pathname.startsWith('/admin') || location.pathname.startsWith('/employee');
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
 
   // Auto-logout admin users when they access public pages
@@ -30,14 +31,14 @@ const AppContent = () => {
     const publicRoutes = ['/', '/services', '/contact', '/book-now', '/privacy', '/terms'];
     const isPublicRoute = publicRoutes.includes(location.pathname);
 
-    if (isPublicRoute && currentUser && userData?.role === 'admin') {
+    if (isPublicRoute && currentUser && (userData?.role === 'admin' || userData?.role === 'employee')) {
       logout().catch(err => console.error('Auto-logout failed:', err));
     }
   }, [location.pathname, currentUser, userData, logout]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      {!isAdmin && <Header />}
+      {!isPortal && <Header />}
       <main style={{ flex: 1 }}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -61,12 +62,19 @@ const AppContent = () => {
             </ProtectedRoute>
           } />
 
+          {/* Protected Employee Operations Portal */}
+          <Route path="/employee" element={
+            <ProtectedRoute employeeOnly={true}>
+              <Employee />
+            </ProtectedRoute>
+          } />
+
           {/* Legal Pages */}
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
         </Routes>
       </main>
-      {!isAdmin && !isAuthPage && <Footer />}
+      {!isPortal && !isAuthPage && <Footer />}
     </div>
   );
 };
